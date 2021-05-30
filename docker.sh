@@ -27,7 +27,7 @@ case $cmd in
         docker build -f detection_node.dockerfile . -t tkdnn_detection_node $cmd_args
         ;;
     r | run)
-        docker run -it --rm  --name tkdnn_detection_node tkdnn_detection_node $cmd_args
+        docker run -it -v $(pwd):/app --name tkdnn_detection_node tkdnn_detection_node $cmd_args
         ;;
     s | stop)
         docker stop tkdnn_detection_node $cmd_args

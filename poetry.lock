@@ -15,13 +15,13 @@ optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-async-timeout = ">=3.0,<4.0"
-attrs = ">=17.3.0"
-chardet = ">=2.0,<5.0"
-idna-ssl = {version = ">=1.0", markers = "python_version < \"3.7\""}
-multidict = ">=4.5,<7.0"
 typing-extensions = ">=3.6.5"
 yarl = ">=1.0,<2.0"
+async-timeout = ">=3.0,<4.0"
+idna-ssl = {version = ">=1.0", markers = "python_version < \"3.7\""}
+chardet = ">=2.0,<5.0"
+attrs = ">=17.3.0"
+multidict = ">=4.5,<7.0"
 
 [package.extras]
 speedups = ["aiodns", "brotlipy", "cchardet"]
@@ -65,10 +65,10 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*"
 
 [package.extras]
-dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface", "furo", "sphinx", "pre-commit"]
 docs = ["furo", "sphinx", "zope.interface"]
 tests = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface"]
 tests_no_zope = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six"]
+dev = ["coverage[toml] (>=5.0.2)", "hypothesis", "pympler", "pytest (>=4.3.0)", "six", "zope.interface", "furo", "sphinx", "pre-commit"]
 
 [[package]]
 name = "autopep8"
@@ -79,8 +79,8 @@ optional = false
 python-versions = "*"
 
 [package.dependencies]
-pycodestyle = ">=2.7.0"
 toml = "*"
+pycodestyle = ">=2.7.0"
 
 [[package]]
 name = "bidict"
@@ -91,11 +91,11 @@ optional = false
 python-versions = ">=3.6"
 
 [package.extras]
+test = ["hypothesis (<6)", "py (<2)", "pytest (<7)", "pytest-benchmark (>=3.2.0,<4)", "sortedcollections (<2)", "sortedcontainers (<3)", "Sphinx (<4)", "sphinx-autodoc-typehints (<2)"]
+docs = ["Sphinx (<4)", "sphinx-autodoc-typehints (<2)"]
 coverage = ["coverage (<6)", "pytest-cov (<3)"]
 dev = ["setuptools-scm", "hypothesis (<6)", "py (<2)", "pytest (<7)", "pytest-benchmark (>=3.2.0,<4)", "sortedcollections (<2)", "sortedcontainers (<3)", "Sphinx (<4)", "sphinx-autodoc-typehints (<2)", "coverage (<6)", "pytest-cov (<3)", "pre-commit (<3)", "tox (<4)"]
-docs = ["Sphinx (<4)", "sphinx-autodoc-typehints (<2)"]
 precommit = ["pre-commit (<3)"]
-test = ["hypothesis (<6)", "py (<2)", "pytest (<7)", "pytest-benchmark (>=3.2.0,<4)", "sortedcollections (<2)", "sortedcontainers (<3)", "Sphinx (<4)", "sphinx-autodoc-typehints (<2)"]
 
 [[package]]
 name = "certifi"
@@ -166,10 +166,10 @@ pydantic = ">=1.0.0,<2.0.0"
 starlette = "0.13.6"
 
 [package.extras]
+test = ["pytest (==5.4.3)", "pytest-cov (==2.10.0)", "pytest-asyncio (>=0.14.0,<0.15.0)", "mypy (==0.790)", "flake8 (>=3.8.3,<4.0.0)", "black (==20.8b1)", "isort (>=5.0.6,<6.0.0)", "requests (>=2.24.0,<3.0.0)", "httpx (>=0.14.0,<0.15.0)", "email_validator (>=1.1.1,<2.0.0)", "sqlalchemy (>=1.3.18,<2.0.0)", "peewee (>=3.13.3,<4.0.0)", "databases[sqlite] (>=0.3.2,<0.4.0)", "orjson (>=3.2.1,<4.0.0)", "async_exit_stack (>=1.0.1,<2.0.0)", "async_generator (>=1.10,<2.0.0)", "python-multipart (>=0.0.5,<0.0.6)", "aiofiles (>=0.5.0,<0.6.0)", "flask (>=1.1.2,<2.0.0)"]
+doc = ["mkdocs (>=1.1.2,<2.0.0)", "mkdocs-material (>=6.1.4,<7.0.0)", "markdown-include (>=0.5.1,<0.6.0)", "mkdocs-markdownextradata-plugin (>=0.1.7,<0.2.0)", "typer-cli (>=0.0.9,<0.0.10)", "pyyaml (>=5.3.1,<6.0.0)"]
 all = ["requests (>=2.24.0,<3.0.0)", "aiofiles (>=0.5.0,<0.6.0)", "jinja2 (>=2.11.2,<3.0.0)", "python-multipart (>=0.0.5,<0.0.6)", "itsdangerous (>=1.1.0,<2.0.0)", "pyyaml (>=5.3.1,<6.0.0)", "graphene (>=2.1.8,<3.0.0)", "ujson (>=3.0.0,<4.0.0)", "orjson (>=3.2.1,<4.0.0)", "email_validator (>=1.1.1,<2.0.0)", "uvicorn[standard] (>=0.12.0,<0.14.0)", "async_exit_stack (>=1.0.1,<2.0.0)", "async_generator (>=1.10,<2.0.0)"]
 dev = ["python-jose[cryptography] (>=3.1.0,<4.0.0)", "passlib[bcrypt] (>=1.7.2,<2.0.0)", "autoflake (>=1.3.1,<2.0.0)", "flake8 (>=3.8.3,<4.0.0)", "uvicorn[standard] (>=0.12.0,<0.14.0)", "graphene (>=2.1.8,<3.0.0)"]
-doc = ["mkdocs (>=1.1.2,<2.0.0)", "mkdocs-material (>=6.1.4,<7.0.0)", "markdown-include (>=0.5.1,<0.6.0)", "mkdocs-markdownextradata-plugin (>=0.1.7,<0.2.0)", "typer-cli (>=0.0.9,<0.0.10)", "pyyaml (>=5.3.1,<6.0.0)"]
-test = ["pytest (==5.4.3)", "pytest-cov (==2.10.0)", "pytest-asyncio (>=0.14.0,<0.15.0)", "mypy (==0.790)", "flake8 (>=3.8.3,<4.0.0)", "black (==20.8b1)", "isort (>=5.0.6,<6.0.0)", "requests (>=2.24.0,<3.0.0)", "httpx (>=0.14.0,<0.15.0)", "email_validator (>=1.1.1,<2.0.0)", "sqlalchemy (>=1.3.18,<2.0.0)", "peewee (>=3.13.3,<4.0.0)", "databases[sqlite] (>=0.3.2,<0.4.0)", "orjson (>=3.2.1,<4.0.0)", "async_exit_stack (>=1.0.1,<2.0.0)", "async_generator (>=1.10,<2.0.0)", "python-multipart (>=0.0.5,<0.0.6)", "aiofiles (>=0.5.0,<0.6.0)", "flask (>=1.1.2,<2.0.0)"]
 
 [[package]]
 name = "fastapi-socketio"
@@ -180,11 +180,11 @@ optional = false
 python-versions = "*"
 
 [package.dependencies]
+python-engineio = "*"
 fastapi = ">=0.61.1"
 netifaces = ">=0.10.6"
-pydantic = ">=1.6.1"
-python-engineio = "*"
 python-socketio = ">=4.6.0"
+pydantic = ">=1.6.1"
 starlette = ">=0.13.6"
 
 [package.extras]
@@ -200,8 +200,8 @@ python-versions = ">=3.6,<4.0"
 
 [package.dependencies]
 fastapi = "*"
-pydantic = ">=1.0,<2.0"
 sqlalchemy = ">=1.3.12,<2.0.0"
+pydantic = ">=1.0,<2.0"
 
 [[package]]
 name = "filelock"
@@ -239,10 +239,10 @@ optional = false
 python-versions = "*"
 
 [package.dependencies]
+pygments = ">=2.2.0"
+executing = ">=0.3.1"
 asttokens = ">=2.0.1"
 colorama = ">=0.3.9"
-executing = ">=0.3.1"
-pygments = ">=2.2.0"
 
 [[package]]
 name = "idna"
@@ -289,25 +289,20 @@ python-versions = "*"
 
 [[package]]
 name = "learning-loop-node"
-version = "0.1.0"
-description = ""
+version = "0.1.1"
+description = "Python Library for Nodes which connect to the Zauberzeug Learning Loop"
 category = "main"
 optional = false
-python-versions = "^3.6"
-develop = true
+python-versions = ">=3.6,<4.0"
 
 [package.dependencies]
-fastapi = "^0.63.0"
-fastapi-socketio = "^0.0.6"
-fastapi-utils = "^0.2.1"
-python-socketio = {version = "^5.0.4", extras = ["asyncio_client"]}
-requests = "^2.25.1"
-simplejson = "^3.17.2"
-uvicorn = "^0.13.3"
-
-[package.source]
-type = "directory"
-url = "../learning_loop_node"
+fastapi-socketio = ">=0.0.6,<0.0.7"
+simplejson = ">=3.17.2,<4.0.0"
+fastapi-utils = ">=0.2.1,<0.3.0"
+fastapi = ">=0.63.0,<0.64.0"
+uvicorn = ">=0.13.3,<0.14.0"
+requests = ">=2.25.1,<3.0.0"
+python-socketio = {version = ">=5.0.4,<6.0.0", extras = ["asyncio_client"]}
 
 [[package]]
 name = "multidict"
@@ -395,8 +390,8 @@ dataclasses = {version = ">=0.6", markers = "python_version < \"3.7\""}
 
 [package.extras]
 dotenv = ["python-dotenv (>=0.10.4)"]
-email = ["email-validator (>=1.0.3)"]
 typing_extensions = ["typing-extensions (>=3.7.2)"]
+email = ["email-validator (>=1.0.3)"]
 
 [[package]]
 name = "pygments"
@@ -423,15 +418,15 @@ optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-atomicwrites = {version = ">=1.0", markers = "sys_platform == \"win32\""}
-attrs = ">=19.2.0"
-colorama = {version = "*", markers = "sys_platform == \"win32\""}
-importlib-metadata = {version = ">=0.12", markers = "python_version < \"3.8\""}
-iniconfig = "*"
 packaging = "*"
-pluggy = ">=0.12,<1.0.0a1"
 py = ">=1.8.2"
+iniconfig = "*"
+importlib-metadata = {version = ">=0.12", markers = "python_version < \"3.8\""}
+colorama = {version = "*", markers = "sys_platform == \"win32\""}
+attrs = ">=19.2.0"
 toml = "*"
+pluggy = ">=0.12,<1.0.0a1"
+atomicwrites = {version = ">=1.0", markers = "sys_platform == \"win32\""}
 
 [package.extras]
 testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xmlschema"]
@@ -459,8 +454,8 @@ optional = false
 python-versions = "*"
 
 [package.extras]
-asyncio_client = ["aiohttp (>=3.4)"]
 client = ["requests (>=2.21.0)", "websocket-client (>=0.54.0)"]
+asyncio_client = ["aiohttp (>=3.4)"]
 
 [[package]]
 name = "python-multipart"
@@ -482,14 +477,14 @@ optional = false
 python-versions = "*"
 
 [package.dependencies]
-aiohttp = {version = ">=3.4", optional = true, markers = "extra == \"asyncio_client\""}
-bidict = ">=0.21.0"
-python-engineio = ">=4"
 websockets = {version = ">=7.0", optional = true, markers = "extra == \"asyncio_client\""}
+python-engineio = ">=4"
+bidict = ">=0.21.0"
+aiohttp = {version = ">=3.4", optional = true, markers = "extra == \"asyncio_client\""}
 
 [package.extras]
-asyncio_client = ["aiohttp (>=3.4)", "websockets (>=7.0)"]
 client = ["requests (>=2.21.0)", "websocket-client (>=0.54.0)"]
+asyncio_client = ["aiohttp (>=3.4)", "websockets (>=7.0)"]
 
 [[package]]
 name = "requests"
@@ -500,9 +495,9 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*"
 
 [package.dependencies]
+idna = ">=2.5,<3"
 certifi = ">=2017.4.17"
 chardet = ">=3.0.2,<5"
-idna = ">=2.5,<3"
 urllib3 = ">=1.21.1,<1.27"
 
 [package.extras]
@@ -534,28 +529,28 @@ optional = false
 python-versions = "!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*,!=3.5.*,>=2.7"
 
 [package.dependencies]
-greenlet = {version = "!=0.4.17", markers = "python_version >= \"3\""}
 importlib-metadata = {version = "*", markers = "python_version < \"3.8\""}
+greenlet = {version = "!=0.4.17", markers = "python_version >= \"3\""}
 
 [package.extras]
-aiomysql = ["greenlet (!=0.4.17)", "aiomysql"]
-aiosqlite = ["greenlet (!=0.4.17)", "aiosqlite"]
-asyncio = ["greenlet (!=0.4.17)"]
-mariadb_connector = ["mariadb (>=1.0.1)"]
 mssql = ["pyodbc"]
-mssql_pymssql = ["pymssql"]
-mssql_pyodbc = ["pyodbc"]
 mypy = ["sqlalchemy2-stubs", "mypy (>=0.800)"]
-mysql = ["mysqlclient (>=1.4.0,<2)", "mysqlclient (>=1.4.0)"]
-mysql_connector = ["mysqlconnector"]
-oracle = ["cx_oracle (>=7,<8)", "cx_oracle (>=7)"]
 postgresql = ["psycopg2 (>=2.7)"]
 postgresql_asyncpg = ["greenlet (!=0.4.17)", "asyncpg"]
-postgresql_pg8000 = ["pg8000 (>=1.16.6)"]
-postgresql_psycopg2binary = ["psycopg2-binary"]
 postgresql_psycopg2cffi = ["psycopg2cffi"]
+mysql_connector = ["mysqlconnector"]
 pymysql = ["pymysql (<1)", "pymysql"]
+mssql_pymssql = ["pymssql"]
+oracle = ["cx_oracle (>=7,<8)", "cx_oracle (>=7)"]
+postgresql_pg8000 = ["pg8000 (>=1.16.6)"]
+aiosqlite = ["greenlet (!=0.4.17)", "aiosqlite"]
+postgresql_psycopg2binary = ["psycopg2-binary"]
+mysql = ["mysqlclient (>=1.4.0,<2)", "mysqlclient (>=1.4.0)"]
 sqlcipher = ["sqlcipher3-binary"]
+aiomysql = ["greenlet (!=0.4.17)", "aiomysql"]
+mariadb_connector = ["mariadb (>=1.0.1)"]
+mssql_pyodbc = ["pyodbc"]
+asyncio = ["greenlet (!=0.4.17)"]
 
 [[package]]
 name = "starlette"
@@ -593,8 +588,8 @@ optional = false
 python-versions = ">=2.7, !=3.0.*, !=3.1.*, !=3.2.*, !=3.3.*, !=3.4.*, <4"
 
 [package.extras]
-secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
 socks = ["PySocks (>=1.5.6,!=1.5.7,<2.0)"]
+secure = ["pyOpenSSL (>=0.14)", "cryptography (>=1.3.4)", "idna (>=2.0.0)", "certifi", "ipaddress"]
 brotli = ["brotlipy (>=0.6.0)"]
 
 [[package]]
@@ -606,8 +601,8 @@ optional = false
 python-versions = "*"
 
 [package.dependencies]
-click = ">=7.0.0,<8.0.0"
 h11 = ">=0.8"
+click = ">=7.0.0,<8.0.0"
 typing-extensions = {version = "*", markers = "python_version < \"3.8\""}
 
 [package.extras]
@@ -630,9 +625,9 @@ optional = false
 python-versions = ">=3.6"
 
 [package.dependencies]
-idna = ">=2.0"
-multidict = ">=4.0"
 typing-extensions = {version = ">=3.7.4", markers = "python_version < \"3.8\""}
+multidict = ">=4.0"
+idna = ">=2.0"
 
 [[package]]
 name = "zipp"
@@ -649,7 +644,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "91c02a5ab9fb2df3f0747a837967319862944bb5653edb645aa79ac43eb972d8"
+content-hash = "5e63d60c98b61465cfdbbe0ce31c107c99c243993100b076ecade8f8920d1f11"
 
 [metadata.files]
 aiofiles = [
@@ -883,7 +878,10 @@ iniconfig = [
     {file = "iniconfig-1.1.1-py2.py3-none-any.whl", hash = "sha256:011e24c64b7f47f6ebd835bb12a743f2fbe9a26d4cecaa7f53bc4f35ee9da8b3"},
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
-learning-loop-node = []
+learning-loop-node = [
+    {file = "learning_loop_node-0.1.1-py3-none-any.whl", hash = "sha256:d3ef0578e5698c429bb8b4f6ff560b5b09823abd971a19f650e7a6501e992062"},
+    {file = "learning_loop_node-0.1.1.tar.gz", hash = "sha256:fa8b6c7d7fe64ab3d2f443830a5d0f45270d1a01fb422b52447d5487cc7a6966"},
+]
 multidict = [
     {file = "multidict-5.1.0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:b7993704f1a4b204e71debe6095150d43b2ee6150fa4f44d6d966ec356a8d61f"},
     {file = "multidict-5.1.0-cp36-cp36m-manylinux1_i686.whl", hash = "sha256:9dd6e9b1a913d096ac95d0399bd737e00f2af1e1594a787e00f7975778c8b2bf"},
@@ -1020,6 +1018,7 @@ pillow = [
     {file = "Pillow-8.2.0-pp37-pypy37_pp73-manylinux2010_i686.whl", hash = "sha256:aac00e4bc94d1b7813fe882c28990c1bc2f9d0e1aa765a5f2b516e8a6a16a9e4"},
     {file = "Pillow-8.2.0-pp37-pypy37_pp73-manylinux2010_x86_64.whl", hash = "sha256:22fd0f42ad15dfdde6c581347eaa4adb9a6fc4b865f90b23378aa7914895e120"},
     {file = "Pillow-8.2.0-pp37-pypy37_pp73-win32.whl", hash = "sha256:e98eca29a05913e82177b3ba3d198b1728e164869c613d76d0de4bde6768a50e"},
+    {file = "Pillow-8.2.0-pp37-pypy37_pp73-win_amd64.whl", hash = "sha256:8b56553c0345ad6dcb2e9b433ae47d67f95fc23fe28a0bde15a120f25257e291"},
     {file = "Pillow-8.2.0.tar.gz", hash = "sha256:a787ab10d7bb5494e5f76536ac460741788f1fbce851068d73a87ca7c35fc3e1"},
 ]
 pluggy = [

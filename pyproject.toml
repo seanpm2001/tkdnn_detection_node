@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "detection_node"
 version = "0.1.0"
-description = "AI detections for the Zauberzeug Learning Loop"
+description = "Detection Node for the Zauberzeug Learning Loop"
 authors = ["Zauberzeug <info@zauberzeug.com>"]
 
 [tool.poetry.dependencies]

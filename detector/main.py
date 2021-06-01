@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import APIRouter, Request, File, UploadFile, Header
 from fastapi.encoders import jsonable_encoder
-from learning_loop_node.node import Node
+from learning_loop_node import Node
 from typing import Optional, List, Any
 import cv2
 from glob import glob
@@ -28,6 +28,7 @@ from queue import Queue
 node = Node(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detection node')
 node.path = '/model'
 node.tkdnn_path = '/tkDNN'
+
 try:
     if not helper.layers_exported(f'{node.tkdnn_path}/darknet/layers'):
         detections_helper.export_weights(helper.find_cfg_file(node.path), helper.find_weight_file(node.path))

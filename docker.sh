@@ -5,7 +5,7 @@ then
     echo "Usage:"
     echo
     echo "  `basename $0` (b | build)        Build"
-    echo "  `basename $0` (r | run)          Run"
+    echo "  `basename $0` (u | up)           Run or Start"
     echo "  `basename $0` (s | stop)         Stop"
     echo "  `basename $0` (k | kill)         Kill"
     echo "  `basename $0` rm                 Remove"
@@ -24,25 +24,26 @@ cmd=$1
 cmd_args=${@:2}
 case $cmd in
     b | build)
-        docker build . -t tkdnn_detection_node $cmd_args
+        docker rm tkdnn_detector # remove existing container
+        docker build . -t zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
-    r | run)
-        docker run -it -v $(pwd):/app --name tkdnn_detection_node tkdnn_detection_node $cmd_args
+    u | up)
+        docker start tkdnn_detector || docker run -d -v $(pwd):/app --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 80:80 zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
     s | stop)
-        docker stop tkdnn_detection_node $cmd_args
+        docker stop tkdnn_detector $cmd_args
         ;;
     k | kill)
-        docker kill tkdnn_detection_node $cmd_args
+        docker kill tkdnn_detector $cmd_args
         ;;
     l | log | logs)
-        docker logs -f --tail 100 $cmd_args tkdnn_detection_node
+        docker logs -f --tail 100 $cmd_args tkdnn_detector
         ;;
     e | exec)
-        docker exec $cmd_args tkdnn_detection_node
+        docker exec $cmd_args tkdnn_detector
         ;;
     a | attach)
-        docker exec $cmd_args tkdnn_detection_node /bin/bash
+        docker exec $cmd_args tkdnn_detector /bin/bash
         ;;
     *)
         echo "Unsupported command \"$cmd\""

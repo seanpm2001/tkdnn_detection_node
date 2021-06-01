@@ -14,6 +14,8 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
     ln -s /opt/poetry/bin/poetry && \
     poetry config virtualenvs.create false
 
+RUN apt-get update && apt-get -y install software-properties-common && add-apt-repository ppa:deadsnakes/ppa && apt-get update && apt-get install -y python3.8
+
 WORKDIR /app/
 
 COPY ./pyproject.toml ./poetry.lock* ./

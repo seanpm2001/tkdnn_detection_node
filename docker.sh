@@ -6,6 +6,7 @@ then
     echo
     echo "  `basename $0` (b | build)        Build"
     echo "  `basename $0` (u | up)           Run or Start"
+    echo "  `basename $0` (r | rm)           Remove Container"
     echo "  `basename $0` (s | stop)         Stop"
     echo "  `basename $0` (k | kill)         Kill"
     echo "  `basename $0` rm                 Remove"
@@ -24,6 +25,7 @@ cmd=$1
 cmd_args=${@:2}
 case $cmd in
     b | build)
+        docker kill tkdnn_detector
         docker rm tkdnn_detector # remove existing container
         docker build . -t zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
@@ -36,6 +38,10 @@ case $cmd in
     k | kill)
         docker kill tkdnn_detector $cmd_args
         ;;
+    r | rm)
+        docker kill tkdnn_detector
+        docker rm tkdnn_detector $cmd_args
+        ;;
     l | log | logs)
         docker logs -f --tail 100 $cmd_args tkdnn_detector
         ;;
@@ -43,7 +49,7 @@ case $cmd in
         docker exec $cmd_args tkdnn_detector
         ;;
     a | attach)
-        docker exec $cmd_args tkdnn_detector /bin/bash
+        docker exec -it $cmd_args tkdnn_detector /bin/bash
         ;;
     *)
         echo "Unsupported command \"$cmd\""

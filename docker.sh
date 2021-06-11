@@ -30,7 +30,7 @@ case $cmd in
         docker build . -t zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
     u | up)
-        docker start tkdnn_detector || docker run -d -v $(pwd):/app --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 80:80 zauberzeug/tkdnn_detection_node:latest $cmd_args
+        docker start tkdnn_detector || nvidia-docker run -d -v $(pwd):/app --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 80:80 -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
     s | stop)
         docker stop tkdnn_detector $cmd_args

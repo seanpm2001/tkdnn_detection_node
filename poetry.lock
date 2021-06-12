@@ -314,7 +314,7 @@ python-versions = "*"
 
 [[package]]
 name = "learning-loop-node"
-version = "0.1.5"
+version = "0.1.6"
 description = "Python Library for Nodes which connect to the Zauberzeug Learning Loop"
 category = "main"
 optional = false
@@ -975,8 +975,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 learning-loop-node = [
-    {file = "learning_loop_node-0.1.5-py3-none-any.whl", hash = "sha256:c337ac7a910f520a94f0e84aa91143a02ce41a051a9a0efea5727bb595bd882b"},
-    {file = "learning_loop_node-0.1.5.tar.gz", hash = "sha256:625992917b98ef92886fb5dc554e413ca8a733f4ed3dfc1a1ccb07a4a2f6db6b"},
+    {file = "learning_loop_node-0.1.6-py3-none-any.whl", hash = "sha256:d2cb19e13ad515c1952cf8e33f23677278e3fba60195d9dba83f2f86fc6264d9"},
+    {file = "learning_loop_node-0.1.6.tar.gz", hash = "sha256:5e099eb7c6dcdc6c3aa72e454056208a47a74d094edaf1df1d022674fadd7baf"},
 ]
 multidict = [
     {file = "multidict-5.1.0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:b7993704f1a4b204e71debe6095150d43b2ee6150fa4f44d6d966ec356a8d61f"},

@@ -1,7 +1,7 @@
 import uvicorn
 from fastapi import APIRouter, Request, File, UploadFile, Header
 from fastapi.encoders import jsonable_encoder
-from learning_loop_node import Node
+from learning_loop_node import DetectorNode
 from typing import Optional, List, Any
 import cv2
 from glob import glob
@@ -25,7 +25,7 @@ from threading import Thread
 from queue import Queue
 
 
-node = Node(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detection node')
+node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detection node')
 node.path = '/model'
 node.tkdnn_path = '/tkDNN'
 
@@ -85,7 +85,7 @@ async def compute_detections(request: Request, file: UploadFile = File(...), mac
     return JSONResponse({'box_detections': jsonable_encoder(detections)})
 
 
-def get_detections(image: Any, node: Node) -> List[Detection]:
+def get_detections(image: Any, node: DetectorNode) -> List[Detection]:
     detections = detections_helper.get_detections(image, node.net, node.path)
     return detections
 

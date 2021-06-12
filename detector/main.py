@@ -4,7 +4,6 @@ from fastapi.encoders import jsonable_encoder
 from learning_loop_node import DetectorNode
 from typing import Optional, List, Any
 import cv2
-from glob import glob
 import detections_helper
 import PIL.Image
 import numpy as np
@@ -13,7 +12,6 @@ import helper
 from icecream import ic
 from fastapi_utils.tasks import repeat_every
 from active_learner import learner as l
-import json
 from active_learner import detection as d
 import requests
 from detection import Detection
@@ -21,21 +19,13 @@ import os
 import PIL.Image
 import asyncio
 from helper import data_dir
-from threading import Thread
-from queue import Queue
 
 
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detection node')
-node.path = '/model'
-node.tkdnn_path = '/tkDNN'
 
 try:
-    if not helper.layers_exported(f'{node.tkdnn_path}/darknet/layers'):
-        detections_helper.export_weights(helper.find_cfg_file(node.path), helper.find_weight_file(node.path))
-    if not helper.rt_file_exists(node.tkdnn_path):
-        detections_helper.create_rt_file()
-
-    node.net = detections_helper.load_network_file(f'{node.tkdnn_path}/darknet_fp16.rt', node.path)
+    net = detections_helper.load_network('/data/model.rt'.encode("ascii"),
+                                         detections_helper.class_count('/data/names.txt'), 1)
 except Exception as e:
     ic(f'Error: could not load model: {e}')
 
@@ -77,7 +67,7 @@ async def compute_detections(request: Request, file: UploadFile = File(...), mac
     image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
     img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-    detections = get_detections(img_rgb, node)
+    detections = get_detections(img_rgb)
 
     loop = asyncio.get_event_loop()
     loop.create_task(learn(detections, mac, tags, file, str(file.filename)))
@@ -85,8 +75,8 @@ async def compute_detections(request: Request, file: UploadFile = File(...), mac
     return JSONResponse({'box_detections': jsonable_encoder(detections)})
 
 
-def get_detections(image: Any, node: DetectorNode) -> List[Detection]:
-    detections = detections_helper.get_detections(image, node.net, node.path)
+def get_detections(image: Any) -> List[Detection]:
+    detections = detections_helper.get_detections(image, net)
     return detections
 
 

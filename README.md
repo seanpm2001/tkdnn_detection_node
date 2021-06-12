@@ -14,5 +14,24 @@ Runs only on NVidia Jetson (Tegra Architecture).
 
 ```bash
 docker pull zauberzeug/tkdnn_detection_node:latest # to make sure we have the latest image
-docker run -it --rm --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -e ORGANIZATION=zauberzeug -e PROJECT=e925c4f3-4d21-4a60-9145-4124759a2a53 -p 80:80 -v model:/model zauberzeug/tkdnn_detection_node:latest
+docker run -it --rm --runtime=nvidia -p 80:80 \
+-v $(pwd)/data:/data \          # bind the model to make it persistent (should contain an model.rt file)
+-e NVIDIA_VISIBLE_DEVICES=all \ # to enable hardware acceleration
+-e ORGANIZATION=zauberzeug \    # define your organization
+-e PROJECT=demo\                # define the project for which the detector should run
+zauberzeug/tkdnn_detection_node:latest
 ```
+
+If the container is up and running you shuld be able to get detections through the RESTful API:
+
+```bash
+curl --request POST -H 'mac: FF:FF' -F 'file=@test.jpg' localhost/detect
+```
+
+## Development
+
+Put a TensorRT model `model.rt` and a `names.txt` with the category names into the `data` folder.
+You can use the `download_model_for_testing.sh` helper.
+
+Build the container with `./docker.sh build` and run it with `./docker.sh run`.
+Now you can connect to the container with vs code and modify the code.

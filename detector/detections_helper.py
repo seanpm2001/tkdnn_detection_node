@@ -32,33 +32,10 @@ get_network_boxes.argtypes = [c_void_p, c_float, POINTER(c_int)]
 get_network_boxes.restype = POINTER(c_classes.DETECTION)
 
 
-def get_number_of_classes(model_path: str) -> int:
-    with open(f'{model_path}/names.txt', 'r') as f:
+def class_count(names_txt: str) -> int:
+    with open(names_txt, 'r') as f:
         names = f.read().rstrip('\n').split('\n')
     return len(names)
-
-
-def export_weights(cfg_file_path: str, weightfile_path: str):
-    cmd = f'cd /tkDNN/darknet; ./darknet export {cfg_file_path} {weightfile_path} layers'
-    p = subprocess.Popen(cmd, shell=True)
-    _, err = p.communicate()
-    # if err:
-    #     raise Exception(f'Failed to export weights: {err}')
-    return p.returncode
-
-
-def create_rt_file():
-    cmd = f'cd /tkDNN/build; export TKDNN_MODE=FP16; ./test_yolo4tiny'
-    p = subprocess.Popen(cmd, shell=True)
-    _, err = p.communicate()
-    # if err:
-    #     raise Exception(f'Failed to create .rt file: {err}')
-    return p.returncode
-
-
-def load_network_file(rt_file_path: str, model_path: str) -> None:
-    net = load_network(rt_file_path.encode("ascii"), get_number_of_classes(model_path), 1)
-    return net
 
 
 def create_darknet_image(image: Any) -> None:
@@ -73,10 +50,10 @@ def create_darknet_image(image: Any) -> None:
     return darknet_image
 
 
-def get_detections(image: Any, net: bytes, model_path: str) -> List[d.Detection]:
+def get_detections(image: Any, net: bytes) -> List[d.Detection]:
     darknet_image = create_darknet_image(image)
-    net_id = get_model_id(model_path)
-    detections = detect_image(net, darknet_image, net_id)
+    model_id = 'unknown model'  # TODO see https://trello.com/c/C2HJ0g01/174-tensorrt-file-f%C3%BCr-tkdnn-detector-deployen
+    detections = detect_image(net, darknet_image, model_id)
     parsed_detections = parse_detections(detections)
     return parsed_detections
 
@@ -109,8 +86,3 @@ def parse_detections(detections: List[UNION[int, str]]) -> List[d.Detection]:
         parsed_detections.append(detection)
 
     return parsed_detections
-
-
-def get_model_id(model_path: str) -> str:
-    weightfile = helper.find_weight_file(model_path)
-    return os.path.basename(weightfile).split('.')[0]

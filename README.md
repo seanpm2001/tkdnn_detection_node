@@ -13,5 +13,6 @@ It is intended to run on NVidia Jetson (>= r32.4.4) by utilizing TKDNN for now.
 Runs only on NVidia Jetson (Tegra Architecture).
 
 ```bash
-docker run -it --rm --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 80:80 -v model:/model zauberzeug/tkdnn_detection_node:latest
+docker pull zauberzeug/tkdnn_detection_node:latest # to make sure we have the latest image
+docker run -it --rm --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -e ORGANIZATION=zauberzeug -e PROJECT=e925c4f3-4d21-4a60-9145-4124759a2a53 -p 80:80 -v model:/model zauberzeug/tkdnn_detection_node:latest
 ```

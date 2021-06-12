@@ -5,8 +5,8 @@ then
     echo "Usage:"
     echo
     echo "  `basename $0` (b | build)        Build"
-    echo "  `basename $0` (u | up)           Run or Start"
-    echo "  `basename $0` (r | rm)           Remove Container"
+    echo "  `basename $0` (r | run)          Run"
+    echo "  `basename $0` (d | rm)           Remove Container"
     echo "  `basename $0` (s | stop)         Stop"
     echo "  `basename $0` (k | kill)         Kill"
     echo "  `basename $0` rm                 Remove"
@@ -29,8 +29,8 @@ case $cmd in
         docker rm tkdnn_detector # remove existing container
         docker build . -t zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
-    u | up)
-        docker start tkdnn_detector || nvidia-docker run -d -v $(pwd):/app --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 80:80 -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static zauberzeug/tkdnn_detection_node:latest $cmd_args
+    r | run)
+        nvidia-docker run -it -v $(pwd):/app --rm --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 80:80 -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
     s | stop)
         docker stop tkdnn_detector $cmd_args
@@ -38,7 +38,7 @@ case $cmd in
     k | kill)
         docker kill tkdnn_detector $cmd_args
         ;;
-    r | rm)
+    d | rm)
         docker kill tkdnn_detector
         docker rm tkdnn_detector $cmd_args
         ;;

@@ -27,4 +27,7 @@ ENV PYTHONPATH=/app
 
 EXPOSE 80
 
+ENV SERVER_BASE_URL=https://learning-loop.ai
+ENV WEBSOCKET_BASE_URL_DEFAULT=wss://learning-loop.ai
+
 CMD ["/app/start.sh"]

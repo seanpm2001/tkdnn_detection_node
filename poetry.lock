@@ -41,6 +41,14 @@ six = "*"
 test = ["astroid", "pytest"]
 
 [[package]]
+name = "async-generator"
+version = "1.10"
+description = "Async generators and context managers for Python 3.5+"
+category = "main"
+optional = false
+python-versions = ">=3.5"
+
+[[package]]
 name = "async-timeout"
 version = "3.0.1"
 description = "Timeout context manager for asyncio programs"
@@ -314,7 +322,7 @@ python-versions = "*"
 
 [[package]]
 name = "learning-loop-node"
-version = "0.1.6"
+version = "0.1.7"
 description = "Python Library for Nodes which connect to the Zauberzeug Learning Loop"
 category = "main"
 optional = false
@@ -322,6 +330,7 @@ python-versions = ">=3.6,<4.0"
 
 [package.dependencies]
 aiofiles = ">=0.7.0,<0.8.0"
+async_generator = ">=1.10,<2.0"
 fastapi = ">=0.63.0,<0.64.0"
 fastapi-socketio = ">=0.0.6,<0.0.7"
 fastapi-utils = ">=0.2.1,<0.3.0"
@@ -763,6 +772,10 @@ asttokens = [
     {file = "asttokens-2.0.4-py2.py3-none-any.whl", hash = "sha256:766d3352908730efb20b95ae22db0f1cb1bedb67c6071fcffb5c236ea673f2f7"},
     {file = "asttokens-2.0.4.tar.gz", hash = "sha256:a42e57e28f2ac1c85ed9b1f84109401427e5c63c04f61d15b8842b027eec5128"},
 ]
+async-generator = [
+    {file = "async_generator-1.10-py3-none-any.whl", hash = "sha256:01c7bf666359b4967d2cda0000cc2e4af16a0ae098cbffcb8472fb9e8ad6585b"},
+    {file = "async_generator-1.10.tar.gz", hash = "sha256:6ebb3d106c12920aaae42ccb6f787ef5eefdcdd166ea3d628fa8476abe712144"},
+]
 async-timeout = [
     {file = "async-timeout-3.0.1.tar.gz", hash = "sha256:0c3c816a028d47f659d6ff5c745cb2acf1f966da1fe5c19c77a70282b25f4c5f"},
     {file = "async_timeout-3.0.1-py3-none-any.whl", hash = "sha256:4291ca197d287d274d0b6cb5d6f8f8f82d434ed288f962539ff18cc9012f9ea3"},
@@ -975,8 +988,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 learning-loop-node = [
-    {file = "learning_loop_node-0.1.6-py3-none-any.whl", hash = "sha256:d2cb19e13ad515c1952cf8e33f23677278e3fba60195d9dba83f2f86fc6264d9"},
-    {file = "learning_loop_node-0.1.6.tar.gz", hash = "sha256:5e099eb7c6dcdc6c3aa72e454056208a47a74d094edaf1df1d022674fadd7baf"},
+    {file = "learning_loop_node-0.1.7-py3-none-any.whl", hash = "sha256:ac4811d49351df318f0de2d885406382d5d67762ee8e2b64e149d3c892ca3e90"},
+    {file = "learning_loop_node-0.1.7.tar.gz", hash = "sha256:adf42ca4efdfcf3837c519f1c2bcac4c0aee09860c3b89617151e1e2105a005d"},
 ]
 multidict = [
     {file = "multidict-5.1.0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:b7993704f1a4b204e71debe6095150d43b2ee6150fa4f44d6d966ec356a8d61f"},

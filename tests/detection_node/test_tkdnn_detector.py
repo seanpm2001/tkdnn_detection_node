@@ -7,15 +7,9 @@ import cv2
 import detector.tkdnn as detections_helper
 import detector.helper as helper
 from detector.helper import data_dir
-from glob import glob
-import os
 import json
 import pytest
-import time
 from ctypes import *
-
-base_path = '/data'
-image_path = f'{base_path}/2462abd538f8_2021-01-17_08-33-49.800.jpg'
 
 
 def test_initialization(detector):
@@ -26,15 +20,19 @@ def test_initialization(detector):
 
 
 def test_detection(detector):
-    detections = detector.evaluate(cv2.imread(image_path))
-    assert len(detections) == 5
+    image = cv2.imread('/data/test.jpg')
+    detections = detector.evaluate(image)
+    for d in detections:
+        image = cv2.rectangle(image, (d.x, d.y), (d.x + d.width, d.y + d.height), (0, 0, 0), 2)
+    cv2.imwrite('/data/test-result.jpg', image)
+    assert len(detections) == 13
     d = detections[0]
-    assert d.category_name == 'dirt'
-    assert d.confidence == 85.6
-    assert d.x == 1024
-    assert d.y == 1355
-    assert d.width == 27
-    assert d.height == 33
+    assert d.category_name == 'marker_hinten_rechts'
+    assert d.confidence == 99.9
+    assert d.x == 724
+    assert d.y == 526
+    assert d.width == 38
+    assert d.height == 37
     assert d.model_name == 'unknown model'
 
 

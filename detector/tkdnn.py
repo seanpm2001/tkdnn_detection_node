@@ -56,33 +56,23 @@ class Detector():
 
     def evaluate(self, image: Any) -> List[Detection]:
         resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
-        frame_data = resized.ctypes.data_as(c_char_p)
-        copy_image_from_bytes(self.image, frame_data)
+        resized_data = resized.ctypes.data_as(c_char_p)
+        copy_image_from_bytes(self.image, resized_data)
 
         num = c_int(0)
         pnum = pointer(num)
         do_inference(self.net, self.image)
-        theshold = 0.2  # TODO make this configurable thorugh REST call
-        dets = get_network_boxes(self.net, theshold, pnum)
-        detections = []
-        for i in range(pnum[0]):
-            bbox = dets[i].bbox
-            detections.append((dets[i].name.decode("ascii"), dets[i].prob,
-                              bbox.x, bbox.y, bbox.w, bbox.h))
+        threshold = 0.2  # TODO make this configurable thorugh REST call
+        detections = get_network_boxes(self.net, threshold, pnum)
+        detections = [detections[i] for i in range(pnum[0])]  # convert c to python
 
-        parsed_detections = []
-
-        (w, h, _) = image.shape
+        (h, w, _) = image.shape
         w_ratio = w/self.image.w
         h_ratio = h/self.image.h
-        for detection in detections:
-            category_name = detection[0]
-            confidence = round(detection[1], 3) * 100
-            left = int(detection[2] * w_ratio)
-            top = int(detection[3] * h_ratio)
-            width = int(detection[4] * w_ratio)
-            height = int(detection[5] * h_ratio)
-            detection = Detection(category_name, left, top, width, height, self.model_id, confidence)
-            parsed_detections.append(detection)
 
-        return parsed_detections
+        return [Detection(
+            d.name.decode("ascii"),
+            int(d.bbox.x * w_ratio), int(d.bbox.y * h_ratio),
+            int(d.bbox.w * w_ratio), int(d.bbox.h * h_ratio),
+            self.model_id, round(d.prob, 3) * 100
+        ) for d in detections]

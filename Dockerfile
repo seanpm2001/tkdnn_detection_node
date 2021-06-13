@@ -24,6 +24,7 @@ RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; els
 
 COPY ./ ./
 ENV PYTHONPATH=/app
+RUN ln -s /app/data /data
 
 EXPOSE 80
 

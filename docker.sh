@@ -27,7 +27,7 @@ case $cmd in
     b | build)
         docker kill tkdnn_detector
         docker rm tkdnn_detector # remove existing container
-        docker build . -t zauberzeug/tkdnn_detection_node:latest $cmd_args
+        docker build . --build-arg INSTALL_DEV=true -t zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
     r | run)
         nvidia-docker run -it -v $(pwd):/app --rm --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 80:80 -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static zauberzeug/tkdnn_detection_node:latest $cmd_args

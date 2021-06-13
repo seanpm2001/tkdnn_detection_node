@@ -1,8 +1,6 @@
 from detector.tkdnn import Detector
 import pytest
 import os
-import shutil
-from detector.helper import data_dir
 
 
 @pytest.fixture(scope='session')

@@ -17,6 +17,7 @@ import requests
 import os
 import PIL.Image
 import asyncio
+from detector.helper import measure
 
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
 detector = Detector()
@@ -48,16 +49,22 @@ async def compute_detections(request: Request, file: UploadFile = File(...), mac
         for i in `seq 1 10`; do time curl --request POST -H 'mac: FF:FF' -F 'file=@test.jpg' localhost:8004/detect; done
     """
 
+    measure(reset=True)
+
     try:
         np_image = np.fromfile(file.file, np.uint8)
     except:
         raise Exception(f'Uploaded file {file.filename} is no image file.')
 
+    measure()
     image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
+    measure()
     detections = detector.evaluate(image)
+    measure()
 
     loop = asyncio.get_event_loop()
     loop.create_task(learn(detections, mac, tags, file, str(file.filename)))
+    measure()
 
     return JSONResponse({'box_detections': jsonable_encoder(detections)})
 
@@ -85,10 +92,10 @@ def check_detections_for_active_learning(detections: List[Detection], mac: str) 
     return active_learning_causes
 
 
-@node.on_event("startup")
-@repeat_every(seconds=30, raise_exceptions=False, wait_first=False)
-def handle_detections() -> None:
-    _handle_detections()
+# @node.on_event("startup")
+# @repeat_every(seconds=30, raise_exceptions=False, wait_first=False)
+# def handle_detections() -> None:
+#     _handle_detections()
 
 
 def _handle_detections() -> None:  # TODO move

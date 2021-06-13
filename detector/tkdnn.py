@@ -6,6 +6,7 @@ from detector.detection import Detection
 from ctypes import *
 import detector.c_classes as c_classes
 import logging
+from detector.helper import measure
 
 
 lib = CDLL("/tkDNN/build/libdarknetRT.so", RTLD_GLOBAL)
@@ -55,24 +56,30 @@ class Detector():
         self.model_id = 'unknown model'  # TODO see https://trello.com/c/C2HJ0g01/174-tensorrt-file-f%C3%BCr-tkdnn-detector-deployen
 
     def evaluate(self, image: Any) -> List[Detection]:
+        measure()
         resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
         resized_data = resized.ctypes.data_as(c_char_p)
         copy_image_from_bytes(self.image, resized_data)
+        measure()
 
         num = c_int(0)
         pnum = pointer(num)
         do_inference(self.net, self.image)
+        measure()
         threshold = 0.2  # TODO make this configurable thorugh REST call
         detections = get_network_boxes(self.net, threshold, pnum)
         detections = [detections[i] for i in range(pnum[0])]  # convert c to python
+        measure()
 
         (h, w, _) = image.shape
         w_ratio = w/self.image.w
         h_ratio = h/self.image.h
 
-        return [Detection(
+        detections = [Detection(
             d.name.decode("ascii"),
             int(d.bbox.x * w_ratio), int(d.bbox.y * h_ratio),
             int(d.bbox.w * w_ratio), int(d.bbox.h * h_ratio),
             self.model_id, round(d.prob, 3) * 100
         ) for d in detections]
+        measure()
+        return detections

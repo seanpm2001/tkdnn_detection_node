@@ -6,21 +6,27 @@ from typing import List, Any
 import json
 import os
 from datetime import datetime
-import cv2
 from fastapi.encoders import jsonable_encoder
 import aiofiles
 from filelock import FileLock
 from icecream import ic
 import os
+import inspect
+import time
 
 data_dir = '/data'
 
 
-def layers_exported(path: str) -> bool:
-    files = glob(f'{path}/*', recursive=True)
-    if files:
-        return True
-    return False
+def measure(reset: bool = False):
+
+    global t
+    if 't' in globals() and not reset:
+        dt = time.time() - t
+        line = inspect.stack()[1][0].f_lineno
+        print(f'{inspect.stack()[1].filename}:{line}', "%6.3f s" % (dt), flush=True)
+    if reset:
+        print('------------ starting new measurements -----------', flush=True)
+    t = time.time()
 
 
 def rt_file_exists(path: str) -> bool:

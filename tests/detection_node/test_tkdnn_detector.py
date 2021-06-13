@@ -25,37 +25,17 @@ def test_initialization(detector):
     assert detector.image.c == 3
 
 
-def test_detect_image():
-    image = cv2.imread(image_path)
-    img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    darknet_image = detections_helper.create_darknet_image(img_rgb)
-    model_id = detections_helper.get_model_id(base_path)
-    detections = detections_helper.detect_image(main.node.net, darknet_image, model_id)
-    assert len(detections) == 7
-    assert detections[0] == ('dirt', 0.852836549282074, 1366.3819580078125,
-                             1017.0836181640625, 36.920166015625, 24.57421875, 'some_weightfile')
-
-
-def test_parse_detections():
-    image = cv2.imread(image_path)
-    img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    darknet_image = detections_helper.create_darknet_image(img_rgb)
-    model_id = detections_helper.get_model_id(base_path)
-    detections = detections_helper.detect_image(main.node.net, darknet_image, model_id)
-    parsed_detections = detections_helper.parse_detections(detections)
-    assert len(parsed_detections) == 7
-    assert parsed_detections[0].__dict__ == {'category_name': 'dirt',
-                                             'confidence': 85.3,
-                                             'height': 24,
-                                             'model_name': 'some_weightfile',
-                                             'width': 36,
-                                             'x': 1366,
-                                             'y': 1017}
-
-
-def test_get_model_id():
-    model_id = detections_helper.get_model_id(base_path)
-    assert model_id == 'some_weightfile'
+def test_detection(detector):
+    detections = detector.evaluate(cv2.imread(image_path))
+    assert len(detections) == 5
+    d = detections[0]
+    assert d.category_name == 'dirt'
+    assert d.confidence == 85.6
+    assert d.x == 1024
+    assert d.y == 1355
+    assert d.width == 27
+    assert d.height == 33
+    assert d.model_name == 'unknown model'
 
 
 @pytest.mark.asyncio()

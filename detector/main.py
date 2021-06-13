@@ -54,8 +54,6 @@ async def compute_detections(request: Request, file: UploadFile = File(...), mac
         raise Exception(f'Uploaded file {file.filename} is no image file.')
 
     image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
-    img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-
     detections = detector.evaluate(image)
 
     loop = asyncio.get_event_loop()

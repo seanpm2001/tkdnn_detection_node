@@ -55,39 +55,34 @@ class Detector():
         self.model_id = 'unknown model'  # TODO see https://trello.com/c/C2HJ0g01/174-tensorrt-file-f%C3%BCr-tkdnn-detector-deployen
 
     def evaluate(self, image: Any) -> List[Detection]:
-        image = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
-        frame_data = image.ctypes.data_as(c_char_p)
+        resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
+        frame_data = resized.ctypes.data_as(c_char_p)
         copy_image_from_bytes(self.image, frame_data)
-        detections = detect_image(net, darknet_image, model_id)
-        parsed_detections = parse_detections(detections)
+
+        num = c_int(0)
+        pnum = pointer(num)
+        do_inference(self.net, self.image)
+        theshold = 0.2  # TODO make this configurable thorugh REST call
+        dets = get_network_boxes(self.net, theshold, pnum)
+        detections = []
+        for i in range(pnum[0]):
+            bbox = dets[i].bbox
+            detections.append((dets[i].name.decode("ascii"), dets[i].prob,
+                              bbox.x, bbox.y, bbox.w, bbox.h))
+
+        parsed_detections = []
+
+        (w, h, _) = image.shape
+        w_ratio = w/self.image.w
+        h_ratio = h/self.image.h
+        for detection in detections:
+            category_name = detection[0]
+            confidence = round(detection[1], 3) * 100
+            left = int(detection[2] * w_ratio)
+            top = int(detection[3] * h_ratio)
+            width = int(detection[4] * w_ratio)
+            height = int(detection[5] * h_ratio)
+            detection = Detection(category_name, left, top, width, height, self.model_id, confidence)
+            parsed_detections.append(detection)
+
         return parsed_detections
-
-
-def detect_image(net, darknet_image, net_id, thresh=.2):
-    num = c_int(0)
-
-    pnum = pointer(num)
-    do_inference(net, darknet_image)
-    dets = get_network_boxes(net, thresh, pnum)
-    detections = []
-    for i in range(pnum[0]):
-        bbox = dets[i].bbox
-        detections.append((dets[i].name.decode("ascii"), dets[i].prob, bbox.x, bbox.y, bbox.w, bbox.h, net_id))
-
-    return detections
-
-
-def parse_detections(detections: List[UNION[int, str]]) -> List[Detection]:
-    parsed_detections = []
-    for detection in detections:
-        category_name = detection[0]
-        confidence = round(detection[1], 3) * 100
-        left = int(detection[2])
-        top = int(detection[3])
-        width = int(detection[4])
-        height = int(detection[5])
-        net_id = detection[6]
-        detection = Detection(category_name, left, top, width, height, net_id, confidence)
-        parsed_detections.append(detection)
-
-    return parsed_detections

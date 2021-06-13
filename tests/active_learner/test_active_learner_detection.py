@@ -1,6 +1,6 @@
-from detection import Detection
+from detector.detection import Detection
 import pytest
-from active_learner import detection
+from detector.active_learner import detection
 import time
 
 

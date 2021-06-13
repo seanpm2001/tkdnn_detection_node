@@ -22,7 +22,7 @@ docker run -it --rm --runtime=nvidia -p 80:80 \
 zauberzeug/tkdnn_detection_node:latest
 ```
 
-If the container is up and running you shuld be able to get detections through the RESTful API:
+If the container is up and running you can get detections through the RESTful API:
 
 ```bash
 curl --request POST -H 'mac: FF:FF' -F 'file=@test.jpg' localhost/detect

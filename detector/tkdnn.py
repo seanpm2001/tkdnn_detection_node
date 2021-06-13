@@ -2,12 +2,10 @@ import cv2
 from typing import List, Any
 from typing import Union as UNION
 from icecream import ic
-import helper
-import os
-import detection as d
-import subprocess
+from detector.detection import Detection
 from ctypes import *
-import c_classes
+import detector.c_classes as c_classes
+import logging
 
 
 lib = CDLL("/tkDNN/build/libdarknetRT.so", RTLD_GLOBAL)
@@ -32,30 +30,37 @@ get_network_boxes.argtypes = [c_void_p, c_float, POINTER(c_int)]
 get_network_boxes.restype = POINTER(c_classes.DETECTION)
 
 
-def class_count(names_txt: str) -> int:
-    with open(names_txt, 'r') as f:
-        names = f.read().rstrip('\n').split('\n')
-    return len(names)
+class Detector():
 
+    def __init__(self):
 
-def create_darknet_image(image: Any) -> None:
-    try:
-        height, width, channels = image.shape
-        darknet_image = make_image(width, height, channels)
+        with open('/data/names.txt', 'r') as f:
+            self.classes = f.read().rstrip('\n').split('\n')
+
+        try:
+            self.net = load_network('/data/model.rt'.encode("ascii"), len(self.classes), 1)
+        except Exception:
+            logging.exception(f'could not load model')
+            raise
+
+        with open('/data/training.cfg', 'r') as f:
+            for l in f.readlines():
+                if l.startswith('width='):
+                    width = int(l.split('=')[1])
+                if l.startswith('height='):
+                    height = int(l.split('=')[1])
+
+            self.image = make_image(width, height, 3)
+
+        self.model_id = 'unknown model'  # TODO see https://trello.com/c/C2HJ0g01/174-tensorrt-file-f%C3%BCr-tkdnn-detector-deployen
+
+    def evaluate(self, image: Any) -> List[Detection]:
+        image = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
         frame_data = image.ctypes.data_as(c_char_p)
-        copy_image_from_bytes(darknet_image, frame_data)
-    except Exception as e:
-        print(e)
-
-    return darknet_image
-
-
-def get_detections(image: Any, net: bytes) -> List[d.Detection]:
-    darknet_image = create_darknet_image(image)
-    model_id = 'unknown model'  # TODO see https://trello.com/c/C2HJ0g01/174-tensorrt-file-f%C3%BCr-tkdnn-detector-deployen
-    detections = detect_image(net, darknet_image, model_id)
-    parsed_detections = parse_detections(detections)
-    return parsed_detections
+        copy_image_from_bytes(self.image, frame_data)
+        detections = detect_image(net, darknet_image, model_id)
+        parsed_detections = parse_detections(detections)
+        return parsed_detections
 
 
 def detect_image(net, darknet_image, net_id, thresh=.2):
@@ -72,7 +77,7 @@ def detect_image(net, darknet_image, net_id, thresh=.2):
     return detections
 
 
-def parse_detections(detections: List[UNION[int, str]]) -> List[d.Detection]:
+def parse_detections(detections: List[UNION[int, str]]) -> List[Detection]:
     parsed_detections = []
     for detection in detections:
         category_name = detection[0]
@@ -82,7 +87,7 @@ def parse_detections(detections: List[UNION[int, str]]) -> List[d.Detection]:
         width = int(detection[4])
         height = int(detection[5])
         net_id = detection[6]
-        detection = d.Detection(category_name, left, top, width, height, net_id, confidence)
+        detection = Detection(category_name, left, top, width, height, net_id, confidence)
         parsed_detections.append(detection)
 
     return parsed_detections

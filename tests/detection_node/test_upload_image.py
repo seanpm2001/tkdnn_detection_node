@@ -2,8 +2,8 @@
 import requests
 import json
 from glob import glob
-import helper
-from helper import data_dir
+import detector.helper as helper
+from detector.helper import data_dir
 
 
 base_path = '/model'

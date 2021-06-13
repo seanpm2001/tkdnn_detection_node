@@ -1,41 +1,28 @@
 import asyncio
-from active_learner.learner import Learner
+from detector.active_learner.learner import Learner
 from pydantic.types import Json
-import main
-import detections_helper
 import requests
 from icecream import ic
 import cv2
-import helper
+import detector.tkdnn as detections_helper
+import detector.helper as helper
+from detector.helper import data_dir
 from glob import glob
 import os
 import json
 import pytest
 import time
-from helper import data_dir
 from ctypes import *
 
-base_path = '/model'
+base_path = '/data'
 image_path = f'{base_path}/2462abd538f8_2021-01-17_08-33-49.800.jpg'
 
 
-# def test_export_weights():
-#     return_code = detections_helper.export_weights(helper.find_cfg_file(base_path), helper.find_weight_file(base_path))
-#     assert return_code == 0
-
-
-def test_get_number_of_classes():
-    classes = detections_helper.get_number_of_classes(base_path)
-    assert classes == 9
-
-
-def test_create_darknet_image():
-    image = cv2.imread(image_path)
-    img_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
-    darknet_image = detections_helper.create_darknet_image(img_rgb)
-    assert darknet_image.w == 1600
-    assert darknet_image.h == 1200
-    assert darknet_image.c == 3
+def test_initialization(detector):
+    assert len(detector.classes) == 9
+    assert detector.image.w == 800
+    assert detector.image.h == 800
+    assert detector.image.c == 3
 
 
 def test_detect_image():

@@ -1,7 +1,7 @@
 from glob import glob
 
 from fastapi.datastructures import UploadFile
-from detection import Detection
+from detector.detection import Detection
 from typing import List, Any
 import json
 import os

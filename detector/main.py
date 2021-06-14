@@ -9,15 +9,10 @@ from fastapi.responses import JSONResponse
 from icecream import ic
 from fastapi_utils.tasks import repeat_every
 from detector.tkdnn import Detector
-import detector.helper as helper
+from detector.outbox import Outbox
 from detector.detection import Detection
 from detector.active_learner import learner as l
-from detector.active_learner import detection as d
-import requests
-import os
-import PIL.Image
 import asyncio
-from detector.helper import measure
 
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
 detector = Detector()
@@ -70,8 +65,7 @@ async def learn(detections: List[Detection], mac: str, tags: Optional[str], imag
             tags_list += tags.split(',') if tags else []
         tags_list += active_learning_causes
 
-        await helper.save_detections_and_image(helper.data_dir, detections, image_data, filename,
-                                               tags_list)
+        await helper.save_detections_and_image(detections, image_data, filename, tags_list)
 
 
 def check_detections_for_active_learning(detections: List[Detection], mac: str) -> List[str]:
@@ -86,24 +80,8 @@ def check_detections_for_active_learning(detections: List[Detection], mac: str) 
 
 @node.on_event("startup")
 @repeat_every(seconds=30, raise_exceptions=False, wait_first=False)
-def handle_detections() -> None:
-    _handle_detections()
-
-
-def _handle_detections() -> None:  # TODO move
-    all_files = helper.get_data_files()
-    image_files = [file for file in all_files if '.json' not in file]
-
-    for file in image_files:
-        file_name = os.path.splitext(file)[0]
-        if not os.path.exists(f'{data_dir}/{file_name}.json.lock') or not os.path.exists(f'{data_dir}/{file}.lock'):
-            data = [('file', open(f'{file_name}.json', 'r')),
-                    ('file', open(file, 'rb'))]
-
-            request = requests.post(f'{node.url}/api/{node.organization}/projects/{node.project}/images', files=data)
-            if request.status_code == 200:
-                os.remove(f'{file_name}.json')
-                os.remove(file)
+def submit() -> None:
+    outbox.submit()
 
 
 node.include_router(router, prefix="")

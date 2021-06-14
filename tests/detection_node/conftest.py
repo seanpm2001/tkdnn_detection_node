@@ -1,4 +1,6 @@
+import shutil
 from detector.tkdnn import Detector
+from detector.outbox import Outbox
 import pytest
 import os
 
@@ -8,3 +10,10 @@ def detector():
     assert os.path.exists(
         '/data/model.rt'), "Error: Could not find model. You need to execute 'detection_node % ./download_model_for_testing.sh'"
     yield Detector()
+
+
+@pytest.fixture(scope='session')
+def outbox():
+    if os.path.exists('/data/outbox'):
+        shutil.rmtree('/data/outbox')
+    yield Outbox()

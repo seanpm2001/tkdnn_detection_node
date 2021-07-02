@@ -16,6 +16,7 @@ import asyncio
 
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
 detector = Detector()
+outbox = Outbox()
 router = APIRouter()
 learners = {}
 
@@ -65,7 +66,7 @@ async def learn(detections: List[Detection], mac: str, tags: Optional[str], imag
             tags_list += tags.split(',') if tags else []
         tags_list += active_learning_causes
 
-        await helper.save_detections_and_image(detections, image_data, filename, tags_list)
+        await outbox.save_detections_and_image(detections, image_data, filename, tags_list)
 
 
 def check_detections_for_active_learning(detections: List[Detection], mac: str) -> List[str]:

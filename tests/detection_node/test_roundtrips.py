@@ -3,6 +3,7 @@ from glob import glob
 import detector.helper as helper
 import asyncio
 from detector.active_learner.learner import Learner
+from detector.outbox import Outbox
 from pydantic.types import Json
 import requests
 import json
@@ -17,7 +18,7 @@ json_path = f'/tmp/{json_name}'
 
 
 @pytest.mark.asyncio()
-async def test_save_image_and_detections_if_mac_was_sent():
+async def test_save_image_and_detections_if_mac_was_sent(outbox: Outbox):
     assert requests.put('http://localhost/reset').status_code == 200
 
     data = {('file', open('/data/test.jpg', 'rb'))}
@@ -38,7 +39,7 @@ async def test_save_image_and_detections_if_mac_was_sent():
 
     # Wait for async file saving
     for retries in range(20):
-        saved_files = helper.get_data_files()
+        saved_files = outbox.get_data_files()
         if len(saved_files) < 2:
             await asyncio.sleep(.2)
         else:
@@ -57,29 +58,3 @@ async def test_save_image_and_detections_if_mac_was_sent():
     tags = json_content['tags']
     assert len(tags) == 3
     assert tags == ['0:0:0:0', 'some_tag', 'lowConfidence']
-
-
-def test_upload_image():
-    assert len(helper.get_data_files()) == 0
-    json_content = {'some_key': 'some_value'}
-
-    with open(json_path, 'w') as f:
-        json.dump(json_content, f)
-
-    data = [('files', open(image_path, 'rb')),
-            ('files', open(json_path, 'r')), ]
-
-    response = requests.post('http://localhost/upload', files=data)
-    assert response.status_code == 200
-
-    data_files = helper.get_data_files()
-    assert len(data_files) == 2
-
-    # we do not check the .jpg file.
-    assert f'{data_dir}/{image_name}' in data_files
-    assert f'{data_dir}/{json_name}' in data_files
-
-    with open(f'{data_dir}/{json_name}', 'r') as f:
-        uploaded_json_content = json.load(f)
-
-    assert uploaded_json_content == json_content

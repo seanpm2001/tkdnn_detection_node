@@ -30,7 +30,7 @@ case $cmd in
         docker build . --build-arg INSTALL_DEV=true -t zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
     r | run)
-        nvidia-docker run -it -v $(pwd):/app --rm --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 80:80 -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static zauberzeug/tkdnn_detection_node:latest $cmd_args
+        nvidia-docker run -it -v $(pwd):/app -e SERVER_BASE_URL=https://preview.learning-loop.ai -e ORGANIZATION=zauberzeug -e PROJECT=test --rm --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 8004:80 -v /usr/bin/qemu-arm-static:/usr/bin/qemu-arm-static zauberzeug/tkdnn_detection_node:latest $cmd_args
         ;;
     s | stop)
         docker stop tkdnn_detector $cmd_args

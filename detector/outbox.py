@@ -61,18 +61,16 @@ class Outbox():
     def submit(self) -> None:
         all_files = self.get_data_files()
         image_files = [file for file in all_files if '.json' not in file]
-        ic(image_files)
         for file in image_files:
             file_name = os.path.splitext(file)[0]
-            if not os.path.exists(f'{self.path}/{file_name}.json.lock') or not os.path.exists(f'{self.path}/{file}.lock'):
+            if not os.path.exists(f'{file_name}.json.lock') or not os.path.exists(f'{file}.lock'):
                 data = [('file', open(f'{file_name}.json', 'r')),
                         ('file', open(file, 'rb'))]
 
                 response = requests.post(self.target_uri, files=data)
-                ic(self.target_uri, response.content)
                 if response.status_code == 200:
-                    os.remove(f'{self.path}/{file_name}.json')
+                    os.remove(f'{file_name}.json')
                     os.remove(file)
-                    ic(self.get_data_files())
+                    logging.info(f'submitted {file} successfully')
                 else:
                     logging.error(f'Could not submit {file}: {response.status_code}, {response.content}')

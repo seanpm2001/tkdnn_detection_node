@@ -14,6 +14,7 @@ def detector():
 
 @pytest.fixture(scope='session')
 def outbox():
-    if os.path.exists('/data/outbox'):
-        shutil.rmtree('/data/outbox')
-    yield Outbox()
+    outbox = Outbox()
+    for f in os.listdir(outbox.path):
+        os.remove(os.path.join(outbox.path, f))
+    yield outbox

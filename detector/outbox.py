@@ -68,11 +68,11 @@ class Outbox():
                 data = [('file', open(f'{file_name}.json', 'r')),
                         ('file', open(file, 'rb'))]
 
-                request = requests.post(self.target_uri, files=data)
-                ic(self.target_uri, request)
-                if request.status_code == 200:
+                response = requests.post(self.target_uri, files=data)
+                ic(self.target_uri, response.content)
+                if response.status_code == 200:
                     os.remove(f'{self.path}/{file_name}.json')
                     os.remove(file)
                     ic(self.get_data_files())
                 else:
-                    logging.error(f'Could not submit {file_name}. Status Code was {request.status_code}')
+                    logging.error(f'Could not submit {file}: {response.status_code}, {response.content}')

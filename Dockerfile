@@ -1,4 +1,4 @@
-FROM zauberzeug/l4t-tkdnn-darknet:nano-r32.4.4
+FROM zauberzeug/l4t-tkdnn-darknet:nano-r32.5.0
 
 # needed for opencv
 RUN apt-get update && apt-get -y install libgl1-mesa-dev && apt-get autoremove -y && rm -rf /var/lib/apt/lists/*

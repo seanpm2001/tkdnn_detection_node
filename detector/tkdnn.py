@@ -75,7 +75,7 @@ class Detector():
             d.name.decode("ascii"),
             int(d.bbox.x * w_ratio), int(d.bbox.y * h_ratio),
             int(d.bbox.w * w_ratio), int(d.bbox.h * h_ratio),
-            self.model_id, round(d.prob, 3) * 100
+            self.model_id, round(d.prob, 2)
         ) for d in detections]
 
         return detections

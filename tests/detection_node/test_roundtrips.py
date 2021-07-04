@@ -29,7 +29,7 @@ async def test_save_image_and_detections_if_mac_was_sent(outbox: Outbox):
 
     expected_detection = {'category_name': 'marker_hinten_rechts',
                           'model_name': 'unknown model',
-                          'confidence': 99.9,
+                          'confidence': 1.0,
                           'height': 37,
                           'width': 38,
                           'x': 724,

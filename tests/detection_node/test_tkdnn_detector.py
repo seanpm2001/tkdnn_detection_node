@@ -19,7 +19,7 @@ def test_detection(detector):
     assert len(detections) == 13
     d = detections[0]
     assert d.category_name == 'marker_hinten_rechts'
-    assert d.confidence == 99.9
+    assert d.confidence == 1.0
     assert d.x == 724
     assert d.y == 526
     assert d.width == 38

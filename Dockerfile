@@ -1,6 +1,5 @@
 
-#FROM zauberzeug/l4t-tkdnn-darknet:nano-r32.5.0
-FROM l4t-tkdnn-darknet:latest
+FROM zauberzeug/l4t-tkdnn-darknet:nano-r32.5.0
 
 RUN apt-get update && apt-get -y install build-essential python3-dev curl libgl1-mesa-dev && apt-get autoremove -y && apt-get clean && rm -rf /var/lib/apt/lists/*
 

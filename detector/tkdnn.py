@@ -9,7 +9,7 @@ import logging
 from detector.helper import measure
 
 
-lib = CDLL("/tkDNN/build/libdarknetRT.so", RTLD_GLOBAL)
+lib = CDLL("/usr/local/lib/libdarknetRT.so", RTLD_GLOBAL)
 
 
 load_network = lib.load_network

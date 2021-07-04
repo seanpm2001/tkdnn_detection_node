@@ -25,7 +25,7 @@ steps:
         path: /var/run/docker.sock
     commands:
       - "docker -D login -u zauberzeug -p $PASSWORD"
-      - "docker push zauberzeug/tkdnn-detection-node-r32.5.0"
+      - "docker push zauberzeug/tkdnn-detection-node:nano-r32.5.0"
 
   - name: readme
     image: chko/docker-pushrm:1

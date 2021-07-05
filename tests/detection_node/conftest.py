@@ -7,6 +7,7 @@ from detector.outbox import Outbox
 import pytest
 import os
 import asyncio
+import logging
 
 
 @pytest.fixture(scope='session')
@@ -28,7 +29,15 @@ def outbox():
 async def sio() -> Generator:
 
     sio = socketio.AsyncClient()
-    await sio.connect("ws://localhost", socketio_path="/ws/socket.io")
+    try_connect = True
+    while try_connect:
+        try:
+            await sio.connect("ws://localhost", socketio_path="/ws/socket.io")
+            try_connect = False
+        except:
+            logging.warning('trying again')
+            await asyncio.sleep(1)
+
     assert sio.transport() == 'websocket'
     yield sio
     await sio.disconnect()

@@ -10,6 +10,7 @@ from pydantic.types import Json
 import requests
 import json
 import pytest
+import time
 
 
 base_path = '/data'
@@ -17,6 +18,16 @@ image_name = 'test.jpg'
 json_name = 'test.json'
 image_path = f'{base_path}/{image_name}'
 json_path = f'/tmp/{json_name}'
+
+expected_detection = {
+    'category_name': 'marker_hinten_rechts',
+    'model_name': 'unknown model',
+    'confidence': 1.0,
+    'height': 37,
+    'width': 38,
+    'x': 724,
+    'y': 526
+}
 
 
 @pytest.mark.asyncio()
@@ -29,13 +40,6 @@ async def test_save_image_and_detections_if_mac_was_sent(outbox: Outbox):
     assert request.status_code == 200
     detections = request.json()['box_detections']
 
-    expected_detection = {'category_name': 'marker_hinten_rechts',
-                          'model_name': 'unknown model',
-                          'confidence': 1.0,
-                          'height': 37,
-                          'width': 38,
-                          'x': 724,
-                          'y': 526}
     assert len(detections) == 13
     assert detections[0] == expected_detection
 
@@ -67,5 +71,16 @@ async def test_detect_via_socketio(sio: socketio.Client):
     with open('/data/test.jpg', 'rb') as f:
         image_bytes = f.read()
 
-    result = await sio.call('detect', image_bytes)
-    assert result == 'test'
+    sum = 0
+    measurements = 10
+    for i in range(measurements):
+        start_time = time.time()
+        result = await sio.call('detect', {'image': image_bytes})
+        dt = (time.time() - start_time) * 1000
+        if i > 0: # first detection may be slow
+            sum += dt
+        assert result['box_detections'][0] == expected_detection
+
+    avereage = int(sum / (measurements-1))
+    print(f'~{avereage} ms ', end='')
+    assert avereage < 175, 'avereage detection time should be low'

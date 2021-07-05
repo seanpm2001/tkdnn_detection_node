@@ -13,7 +13,9 @@ from detector.tkdnn import Detector
 from detector.outbox import Outbox
 from detector.detection import Detection
 from detector.active_learner import learner as l
+from detector import helper
 import asyncio
+from datetime import datetime
 
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
 sio = SocketManager(app=node)
@@ -39,11 +41,12 @@ async def upload_image(request: Request, files: List[UploadFile] = File(...)):
 
 @node.sio.event
 async def detect(sid, data):
-    return "ohala"
-
+    np_image = np.frombuffer(data['image'])
+    detections = get_detections(np_image, data.get('mac', None), data.get('tags', None))
+    return detections
 
 @router.post("/detect")
-async def compute_detections(request: Request, file: UploadFile = File(...), mac: str = Header(...), tags: Optional[str] = Header(None)):
+async def http_detect(request: Request, file: UploadFile = File(...), mac: str = Header(...), tags: Optional[str] = Header(None)):
     """
     Example Usage
 
@@ -56,10 +59,14 @@ async def compute_detections(request: Request, file: UploadFile = File(...), mac
     except:
         raise Exception(f'Uploaded file {file.filename} is no image file.')
 
-    return JSONResponse(detect(np_image, mac, tags, str(file.filename)))
+    return JSONResponse(get_detections(np_image, mac, tags))
 
 
-def detect(np_image, mac: str, tags: str, filename: str):
+def get_detections(np_image, mac: str, tags: str):
+    filename = datetime.now().isoformat()
+    if mac is not None:
+        filename += '_' + mac
+
     image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
     detections = detector.evaluate(image)
 
@@ -96,9 +103,19 @@ def submit() -> None:
     outbox.submit()
 
 
+sids = []
+
+
+@node.sio.event
+def connect(sid, environ, auth):
+    global sids
+    sids.append(sid)
+
+
 @node.on_event("shutdown")
 async def shutdown():
-    await node.sio.disconnect()
+    for sid in sids:
+        await node.sio.disconnect(sid)
 
 node.include_router(router, prefix="")
 

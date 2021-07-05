@@ -1,5 +1,7 @@
 import json
 from glob import glob
+
+import socketio
 import detector.helper as helper
 import asyncio
 from detector.active_learner.learner import Learner
@@ -58,3 +60,12 @@ async def test_save_image_and_detections_if_mac_was_sent(outbox: Outbox):
     tags = json_content['tags']
     assert len(tags) == 3
     assert tags == ['0:0:0:0', 'some_tag', 'lowConfidence']
+
+
+@pytest.mark.asyncio()
+async def test_detect_via_socketio(sio: socketio.Client):
+    with open('/data/test.jpg', 'rb') as f:
+        image_bytes = f.read()
+
+    result = await sio.call('detect', image_bytes)
+    assert result == 'test'

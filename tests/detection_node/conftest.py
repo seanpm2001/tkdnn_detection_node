@@ -1,8 +1,12 @@
-import shutil
+from logging import Logger
+from typing import Generator
+
+import socketio
 from detector.tkdnn import Detector
 from detector.outbox import Outbox
 import pytest
 import os
+import asyncio
 
 
 @pytest.fixture(scope='session')
@@ -18,3 +22,13 @@ def outbox():
     for f in os.listdir(outbox.path):
         os.remove(os.path.join(outbox.path, f))
     yield outbox
+
+
+@pytest.fixture()
+async def sio() -> Generator:
+
+    sio = socketio.AsyncClient()
+    await sio.connect("ws://localhost", socketio_path="/ws/socket.io")
+    assert sio.transport() == 'websocket'
+    yield sio
+    await sio.disconnect()

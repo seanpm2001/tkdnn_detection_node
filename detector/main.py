@@ -8,6 +8,7 @@ import numpy as np
 from fastapi.responses import JSONResponse
 from icecream import ic
 from fastapi_utils.tasks import repeat_every
+from fastapi_socketio import SocketManager
 from detector.tkdnn import Detector
 from detector.outbox import Outbox
 from detector.detection import Detection
@@ -15,6 +16,7 @@ from detector.active_learner import learner as l
 import asyncio
 
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
+sio = SocketManager(app=node)
 detector = Detector()
 outbox = Outbox()
 router = APIRouter()
@@ -30,9 +32,14 @@ def reset_test_learner(request: Request):
 @router.post("/upload")
 async def upload_image(request: Request, files: List[UploadFile] = File(...)):
     for file_data in files:
-        await helper.write_file(file_data, file_data.filename)
+        await outbox.write_file(file_data, file_data.filename)
 
     return 200, "OK"
+
+
+@node.sio.event
+async def detect(sid, data):
+    return "ohala"
 
 
 @router.post("/detect")
@@ -49,12 +56,16 @@ async def compute_detections(request: Request, file: UploadFile = File(...), mac
     except:
         raise Exception(f'Uploaded file {file.filename} is no image file.')
 
+    return JSONResponse(detect(np_image, mac, tags, str(file.filename)))
+
+
+def detect(np_image, mac: str, tags: str, filename: str):
     image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
     detections = detector.evaluate(image)
 
     loop = asyncio.get_event_loop()
-    loop.create_task(learn(detections, mac, tags, file, str(file.filename)))
-    return JSONResponse({'box_detections': jsonable_encoder(detections)})
+    loop.create_task(learn(detections, mac, tags, np_image, filename))
+    return {'box_detections': jsonable_encoder(detections)}
 
 
 async def learn(detections: List[Detection], mac: str, tags: Optional[str], image_data: Any, filename: str) -> None:
@@ -84,6 +95,10 @@ def check_detections_for_active_learning(detections: List[Detection], mac: str) 
 def submit() -> None:
     outbox.submit()
 
+
+@node.on_event("shutdown")
+async def shutdown():
+    await node.sio.disconnect()
 
 node.include_router(router, prefix="")
 

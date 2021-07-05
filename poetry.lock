@@ -157,7 +157,7 @@ python-versions = ">=2.7,!=3.0.*,!=3.1.*,!=3.2.*,!=3.3.*,!=3.4.*"
 name = "docopt"
 version = "0.6.2"
 description = "Pythonic argument parser, that will make you smile"
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -330,7 +330,7 @@ python-versions = "*"
 
 [[package]]
 name = "learning-loop-node"
-version = "0.1.8"
+version = "0.1.10"
 description = "Python Library for Nodes which connect to the Zauberzeug Learning Loop"
 category = "main"
 optional = false
@@ -343,10 +343,12 @@ fastapi = ">=0.63.0,<0.64.0"
 fastapi-socketio = ">=0.0.6,<0.0.7"
 fastapi-utils = ">=0.2.1,<0.3.0"
 icecream = ">=2.1.0,<3.0.0"
+pytest-watch = ">=4.2.0,<5.0.0"
 python-socketio = {version = ">=5.0.4,<6.0.0", extras = ["asyncio_client"]}
 requests = ">=2.25.1,<3.0.0"
 simplejson = ">=3.17.2,<4.0.0"
 uvicorn = ">=0.13.3,<0.14.0"
+werkzeug = ">=2.0.1,<3.0.0"
 
 [[package]]
 name = "multidict"
@@ -479,7 +481,7 @@ testing = ["argcomplete", "hypothesis (>=3.56)", "mock", "nose", "requests", "xm
 name = "pytest-asyncio"
 version = "0.14.0"
 description = "Pytest support for asyncio."
-category = "main"
+category = "dev"
 optional = false
 python-versions = ">= 3.5"
 
@@ -493,7 +495,7 @@ testing = ["async-generator (>=1.3)", "coverage", "hypothesis (>=5.7.1)"]
 name = "pytest-watch"
 version = "4.2.0"
 description = "Local continuous test runner with pytest and watchdog."
-category = "dev"
+category = "main"
 optional = false
 python-versions = "*"
 
@@ -704,7 +706,7 @@ python-versions = "*"
 name = "watchdog"
 version = "2.1.2"
 description = "Filesystem events monitoring"
-category = "dev"
+category = "main"
 optional = false
 python-versions = ">=3.6"
 
@@ -726,6 +728,20 @@ description = "An implementation of the WebSocket Protocol (RFC 6455 & 7692)"
 category = "main"
 optional = false
 python-versions = ">=3.6"
+
+[[package]]
+name = "werkzeug"
+version = "2.0.1"
+description = "The comprehensive WSGI web application library."
+category = "main"
+optional = false
+python-versions = ">=3.6"
+
+[package.dependencies]
+dataclasses = {version = "*", markers = "python_version < \"3.7\""}
+
+[package.extras]
+watchdog = ["watchdog"]
 
 [[package]]
 name = "yarl"
@@ -755,7 +771,7 @@ testing = ["pytest (>=4.6)", "pytest-checkdocs (>=1.2.3)", "pytest-flake8", "pyt
 [metadata]
 lock-version = "1.1"
 python-versions = "^3.6"
-content-hash = "149d73c2afaad282d4922ea7da5520c44cb980faa16a3343e8342e2f1ee245d4"
+content-hash = "40379ebf07b8a6601b6a9a581164f60a71c60b431c1069c10500f40eb001b929"
 
 [metadata.files]
 aiofiles = [
@@ -1024,8 +1040,8 @@ iniconfig = [
     {file = "iniconfig-1.1.1.tar.gz", hash = "sha256:bc3af051d7d14b2ee5ef9969666def0cd1a000e121eaea580d4a313df4b37f32"},
 ]
 learning-loop-node = [
-    {file = "learning_loop_node-0.1.8-py3-none-any.whl", hash = "sha256:50341b60c63a618e78226da01dc942d0741c08ee54f42cc39d48d52c2fa57faf"},
-    {file = "learning_loop_node-0.1.8.tar.gz", hash = "sha256:990215ddb78ba233a26b3d305f160ca0f51f028a66680484776b688e437dc00d"},
+    {file = "learning_loop_node-0.1.10-py3-none-any.whl", hash = "sha256:7fd191f726e3c00240ca524709f1247ef1941f3ffed7678e0c063a0080a4805e"},
+    {file = "learning_loop_node-0.1.10.tar.gz", hash = "sha256:fb8712ab158a7378078d67d1f766c23af025ca37249d6cfc8150c7b95ff23a96"},
 ]
 multidict = [
     {file = "multidict-5.1.0-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:b7993704f1a4b204e71debe6095150d43b2ee6150fa4f44d6d966ec356a8d61f"},
@@ -1421,6 +1437,10 @@ websockets = [
     {file = "websockets-8.0.2-cp37-cp37m-win32.whl", hash = "sha256:f5cb2683367e32da6a256b60929a3af9c29c212b5091cf5bace9358d03011bf5"},
     {file = "websockets-8.0.2-cp37-cp37m-win_amd64.whl", hash = "sha256:049e694abe33f8a1d99969fee7bfc0ae6761f7fd5f297c58ea933b27dd6805f2"},
     {file = "websockets-8.0.2.tar.gz", hash = "sha256:882a7266fa867a2ebb2c0baaa0f9159cabf131cf18c1b4270d79ad42f9208dc5"},
+]
+werkzeug = [
+    {file = "Werkzeug-2.0.1-py3-none-any.whl", hash = "sha256:6c1ec500dcdba0baa27600f6a22f6333d8b662d22027ff9f6202e3367413caa8"},
+    {file = "Werkzeug-2.0.1.tar.gz", hash = "sha256:1de1db30d010ff1af14a009224ec49ab2329ad2cde454c8a708130642d579c42"},
 ]
 yarl = [
     {file = "yarl-1.6.3-cp36-cp36m-macosx_10_14_x86_64.whl", hash = "sha256:0355a701b3998dcd832d0dc47cc5dedf3874f966ac7f870e0f3a6788d802d434"},

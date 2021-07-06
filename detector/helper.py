@@ -1,5 +1,7 @@
 import inspect
 import time
+import traceback
+import sys
 
 
 def measure(reset: bool = False):
@@ -12,3 +14,10 @@ def measure(reset: bool = False):
     if reset:
         print('------------ starting new measurements -----------', flush=True)
     t = time.time()
+
+
+def print_stacktrace():
+
+    print("-" * 60)
+    traceback.print_exc(file=sys.stdout)
+    print("-" * 60, flush=True)

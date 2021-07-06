@@ -41,8 +41,15 @@ async def upload_image(request: Request, files: List[UploadFile] = File(...)):
 
 @node.sio.event
 async def detect(sid, data):
-    np_image = np.frombuffer(data['image'])
-    detections = get_detections(np_image, data.get('mac', None), data.get('tags', None))
+
+    try:
+        np_image = np.frombuffer(data['image'])
+        detections = get_detections(np_image, data.get('mac', None), data.get('tags', None))
+    except Exception as e:
+        helper.print_stacktrace()
+        with open('/tmp/bad_img_from_socket_io.jpg', 'wb') as f:
+            f.write(data['image'])
+        return {'error': str(e)}
     return detections
 
 @router.post("/detect")

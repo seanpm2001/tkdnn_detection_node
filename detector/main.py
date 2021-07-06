@@ -43,7 +43,7 @@ async def upload_image(request: Request, files: List[UploadFile] = File(...)):
 async def detect(sid, data):
 
     try:
-        np_image = np.frombuffer(data['image'])
+        np_image = np.frombuffer(data['image'], np.uint8)
         detections = get_detections(np_image, data.get('mac', None), data.get('tags', None))
     except Exception as e:
         helper.print_stacktrace()

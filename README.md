@@ -1,7 +1,7 @@
 # Detection Node
 
 This is a node for the Learning Loop wich provides an RESTful API for edge devices to retrieve inferences.
-It is intended to run on NVidia Jetson (>= r32.4.4) by utilizing TKDNN for now.
+It is intended to run on NVidia Jetson (>= r32.4.4) by utilizing TKDNN.
 
 # Features
 

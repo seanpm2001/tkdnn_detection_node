@@ -8,7 +8,7 @@ class Learner:
     def __init__(self):
         self.reset_time = 3600
         self.low_conf_detections: List[d.ActiveLearnerDetection] = []
-        self.iou = 0.9
+        self.iou_threshold = 0.5
 
     def forget_old_detections(self):
         self.low_conf_detections = [detection
@@ -24,10 +24,8 @@ class Learner:
                 continue
 
             similar_detections = self._find_similar_detection_shapes(detection)
-
             if(any(similar_detections)):
-                for sd in similar_detections:
-                    sd.update_last_seen()
+                [sd.update_last_seen() for sd in similar_detections]
             else:
                 self.low_conf_detections.append(d.ActiveLearnerDetection(detection))
                 active_learning_causes.add('lowConfidence')
@@ -35,8 +33,9 @@ class Learner:
         return list(active_learning_causes)
 
     def _find_similar_detection_shapes(self, new_detection: Detection):
-        return [detection
-                for detection in self.low_conf_detections
-                if detection.category_name == new_detection.category_name
-                and detection.intersection_over_union(new_detection) >= self.iou
-                ]
+        return [
+            detection
+            for detection in self.low_conf_detections
+            if detection.category_name == new_detection.category_name
+            and detection.intersection_over_union(new_detection) >= self.iou_threshold
+        ]

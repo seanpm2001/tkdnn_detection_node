@@ -46,13 +46,12 @@ async def detect(sid, data):
 
     try:
         np_image = np.frombuffer(data['image'], np.uint8)
-        detections = get_detections(np_image, data.get('mac', None), data.get('tags', []))
+        return get_detections(np_image, data.get('mac', None), data.get('tags', []))
     except Exception as e:
         helper.print_stacktrace()
         with open('/tmp/bad_img_from_socket_io.jpg', 'wb') as f:
             f.write(data['image'])
         return {'error': str(e)}
-    return detections
 
 
 @router.post("/detect")

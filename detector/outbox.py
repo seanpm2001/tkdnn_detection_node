@@ -34,7 +34,7 @@ class Outbox():
         id = datetime.now().isoformat(sep='_', timespec='milliseconds')
         tmp = f'../tmp/{id}'
         os.makedirs(tmp, exist_ok=True)
-        with open(tmp + '/metadata.json', 'w') as f:
+        with open(tmp + '/image.json', 'w') as f:
             json.dump({
                 'box_detections': jsonable_encoder(detections),
                 'tags': tags,
@@ -51,14 +51,17 @@ class Outbox():
             return
         self.upload_in_progress = True
 
-        for item in self.get_data_files():
-            data = [('file', open(f'{item}/metadata.json', 'r')),
-                    ('file', open(f'{item}/image.jpg', 'rb'))]
+        try:
+            for item in self.get_data_files():
+                data = [('file', open(f'{item}/image.json', 'r')),
+                        ('file', open(f'{item}/image.jpg', 'rb'))]
 
-            response = requests.post(self.target_uri, files=data)
-            if response.status_code == 200:
-                shutil.rmtree(item)
-                logging.info(f'uploaded {item} successfully')
-            else:
-                logging.error(f'Could not upload {item}: {response.status_code}, {response.content}')
+                response = requests.post(self.target_uri, files=data)
+                if response.status_code == 200:
+                    shutil.rmtree(item)
+                    logging.info(f'uploaded {item} successfully')
+                else:
+                    logging.error(f'Could not upload {item}: {response.status_code}, {response.content}')
+        except:
+            logging.exception('could not upload files')
         self.upload_in_progress = False

@@ -85,7 +85,7 @@ def learn(detections: List[Detection], mac: str, tags: Optional[str], cv_image) 
 
     if any(active_learning_causes):
         tags.append(mac)
-        tags.append(active_learning_causes)
+        tags.append(*active_learning_causes)
 
         outbox.save(cv_image, detections, tags)
 

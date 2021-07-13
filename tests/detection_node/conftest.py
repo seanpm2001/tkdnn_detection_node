@@ -8,6 +8,7 @@ import pytest
 import os
 import asyncio
 import logging
+import shutil
 
 
 @pytest.fixture(scope='session')
@@ -20,8 +21,8 @@ def detector():
 @pytest.fixture(scope='session')
 def outbox():
     outbox = Outbox()
-    for f in os.listdir(outbox.path):
-        os.remove(os.path.join(outbox.path, f))
+    shutil.rmtree(outbox.path)
+    os.mkdir(outbox.path)
     yield outbox
 
 

@@ -13,6 +13,8 @@ from datetime import datetime
 import requests
 import logging
 import cv2
+import shutil
+import threading
 
 
 class Outbox():
@@ -26,34 +28,37 @@ class Outbox():
         o = os.environ.get('ORGANIZATION')
         p = os.environ.get('PROJECT')
         self.target_uri = f'{base}/api/{o}/projects/{p}/images'
+        self.upload_in_progress = False
 
     def save(self, cv_image, detections: List[Detection], tags: List[str]) -> None:
-        location = self.path + '/' + datetime.now().isoformat(sep='_', timespec='milliseconds') + '/'
-        os.makedirs(location, exist_ok=True)
-        with open(location + 'metadata.json', 'w') as f:
+        id = datetime.now().isoformat(sep='_', timespec='milliseconds')
+        tmp = f'../tmp/{id}'
+        os.makedirs(tmp, exist_ok=True)
+        with open(tmp + '/metadata.json', 'w') as f:
             json.dump({
                 'box_detections': jsonable_encoder(detections),
                 'tags': tags,
-                'date': datetime.now().isoformat(sep='_', timespec='milliseconds')
+                'date': id,
             }, f)
-        cv2.imwrite(location + 'image.jpg', cv_image)
+        cv2.imwrite(tmp + '/image.jpg', cv_image)
+        os.rename(tmp, self.path + '/' + id)  # NOTE rename is atomic so upload can run in parallel
 
     def get_data_files(self):
-        return glob(f'{self.path}/*[!.lock]', recursive=True)
+        return glob(f'{self.path}/*')
 
-    def submit(self) -> None:
-        all_files = self.get_data_files()
-        image_files = [file for file in all_files if '.json' not in file]
-        for file in image_files:
-            file_name = os.path.splitext(file)[0]
-            if not os.path.exists(f'{file_name}.json.lock') or not os.path.exists(f'{file}.lock'):
-                data = [('file', open(f'{file_name}.json', 'r')),
-                        ('file', open(file, 'rb'))]
+    def upload(self) -> None:
+        if self.upload_in_progress:
+            return
+        self.upload_in_progress = True
 
-                response = requests.post(self.target_uri, files=data)
-                if response.status_code == 200:
-                    os.remove(f'{file_name}.json')
-                    os.remove(file)
-                    logging.info(f'submitted {file} successfully')
-                else:
-                    logging.error(f'Could not submit {file}: {response.status_code}, {response.content}')
+        for item in self.get_data_files():
+            data = [('file', open(f'{item}/metadata.json', 'r')),
+                    ('file', open(f'{item}/image.jpg', 'rb'))]
+
+            response = requests.post(self.target_uri, files=data)
+            if response.status_code == 200:
+                shutil.rmtree(item)
+                logging.info(f'uploaded {item} successfully')
+            else:
+                logging.error(f'Could not upload {item}: {response.status_code}, {response.content}')
+        self.upload_in_progress = False

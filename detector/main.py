@@ -100,10 +100,11 @@ def check_detections_for_active_learning(detections: List[Detection], mac: str) 
     return active_learning_causes
 
 
-# @node.on_event("startup")
-# @repeat_every(seconds=30, raise_exceptions=False, wait_first=False)
-# def submit() -> None:
-#     outbox.submit()
+@node.on_event("startup")
+@repeat_every(seconds=30, raise_exceptions=False, wait_first=False)
+def submit() -> None:
+    thread = Thread(target=outbox.upload)
+    thread.start()
 
 
 sids = []

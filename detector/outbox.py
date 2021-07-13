@@ -32,7 +32,7 @@ class Outbox():
 
     def save(self, cv_image, detections: List[Detection], tags: List[str]) -> None:
         id = datetime.now().isoformat(sep='_', timespec='milliseconds')
-        tmp = f'../tmp/{id}'
+        tmp = f'/data/tmp/{id}'
         os.makedirs(tmp, exist_ok=True)
         with open(tmp + '/image.json', 'w') as f:
             json.dump({

@@ -12,6 +12,7 @@ import json
 from datetime import datetime
 import requests
 import logging
+import cv2
 
 
 class Outbox():
@@ -26,34 +27,16 @@ class Outbox():
         p = os.environ.get('PROJECT')
         self.target_uri = f'{base}/api/{o}/projects/{p}/images'
 
-    async def save_detections_and_image(self, detections: List[Detection], image_data: UploadFile, file_name: str, tags: List[str]) -> None:
-        os.makedirs(self.path, exist_ok=True)
-        file_name_without_type = file_name.rsplit('.', 1)[0]
-        json_file_name = f'{file_name_without_type}.json'
-        await self._write_json(json_file_name, detections, tags)
-        await self.write_file(image_data, file_name)
-
-    async def _write_json(self, json_file_name: str, detections: List[Detection], tags: List[str]) -> None:
-        date = datetime.utcnow().isoformat(sep='_', timespec='milliseconds')
-        json_data = json.dumps({'box_detections': jsonable_encoder(detections),
-                                'tags': tags,
-                                'date': date})
-        with FileLock(lock_file=f'{self.path}/{json_file_name}'):
-            async with aiofiles.open(f'{self.path}/{json_file_name}', 'w') as out_file:
-                await out_file.write(json_data)
-
-    async def write_file(self, file_data: Any, file_name: str):
-        # Be sure to start from beginning.
-        await file_data.seek(0)
-        with FileLock(lock_file=f'{self.path}/{file_name}.lock'):
-            async with aiofiles.open(f'{self.path}/{file_name}', 'wb') as out_file:
-                while True:
-                    content = await file_data.read(1024)  # async read chunk
-                    if not content:
-                        break
-                    await out_file.write(content)  # async write chunk
-
-        os.remove(f'{self.path}/{file_name}.lock')
+    def save(self, cv_image, detections: List[Detection], tags: List[str]) -> None:
+        location = self.path + '/' + datetime.now().isoformat(sep='_', timespec='milliseconds') + '/'
+        os.makedirs(location, exist_ok=True)
+        with open(location + 'metadata.json', 'w') as f:
+            json.dump({
+                'box_detections': jsonable_encoder(detections),
+                'tags': tags,
+                'date': datetime.now().isoformat(sep='_', timespec='milliseconds')
+            }, f)
+        cv2.imwrite(location + 'image.jpg', cv_image)
 
     def get_data_files(self):
         return glob(f'{self.path}/*[!.lock]', recursive=True)

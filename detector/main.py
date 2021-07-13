@@ -16,6 +16,8 @@ from detector.active_learner import learner as l
 from detector import helper
 import asyncio
 from datetime import datetime
+from threading import Thread
+
 
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
 sio = SocketManager(app=node)
@@ -44,13 +46,14 @@ async def detect(sid, data):
 
     try:
         np_image = np.frombuffer(data['image'], np.uint8)
-        detections = get_detections(np_image, data.get('mac', None), data.get('tags', None))
+        detections = get_detections(np_image, data.get('mac', None), data.get('tags', []))
     except Exception as e:
         helper.print_stacktrace()
         with open('/tmp/bad_img_from_socket_io.jpg', 'wb') as f:
             f.write(data['image'])
         return {'error': str(e)}
     return detections
+
 
 @router.post("/detect")
 async def http_detect(request: Request, file: UploadFile = File(...), mac: str = Header(...), tags: Optional[str] = Header(None)):
@@ -66,32 +69,26 @@ async def http_detect(request: Request, file: UploadFile = File(...), mac: str =
     except:
         raise Exception(f'Uploaded file {file.filename} is no image file.')
 
-    return JSONResponse(get_detections(np_image, mac, tags))
+    return JSONResponse(get_detections(np_image, mac, tags.split(',') if tags else []))
 
 
 def get_detections(np_image, mac: str, tags: str):
-    filename = datetime.now().isoformat()
-    if mac is not None:
-        filename += '_' + mac
-
     image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
     detections = detector.evaluate(image)
 
-    loop = asyncio.get_event_loop()
-    loop.create_task(learn(detections, mac, tags, np_image, filename))
+    thread = Thread(target=learn, args=(detections, mac, tags, image))
+    thread.start()
     return {'box_detections': jsonable_encoder(detections)}
 
 
-async def learn(detections: List[Detection], mac: str, tags: Optional[str], image_data: Any, filename: str) -> None:
+def learn(detections: List[Detection], mac: str, tags: Optional[str], cv_image) -> None:
     active_learning_causes = check_detections_for_active_learning(detections, mac)
 
     if any(active_learning_causes):
-        tags_list = [mac]
-        if tags:
-            tags_list += tags.split(',') if tags else []
-        tags_list += active_learning_causes
+        tags.append(mac)
+        tags.append(active_learning_causes)
 
-        await outbox.save_detections_and_image(detections, image_data, filename, tags_list)
+        outbox.save(cv_image, detections, tags)
 
 
 def check_detections_for_active_learning(detections: List[Detection], mac: str) -> List[str]:
@@ -104,10 +101,10 @@ def check_detections_for_active_learning(detections: List[Detection], mac: str) 
     return active_learning_causes
 
 
-@node.on_event("startup")
-@repeat_every(seconds=30, raise_exceptions=False, wait_first=False)
-def submit() -> None:
-    outbox.submit()
+# @node.on_event("startup")
+# @repeat_every(seconds=30, raise_exceptions=False, wait_first=False)
+# def submit() -> None:
+#     outbox.submit()
 
 
 sids = []

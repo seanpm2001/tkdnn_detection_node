@@ -7,10 +7,10 @@ from icecream import ic
 import time
 from detector.detection import Detection
 
-dirt_detection = d.ActiveLearnerDetection(Detection('dirt', 0, 0, 100, 100, 'xyz', 30))
-second_dirt_detection = Detection('dirt', 0, 20, 10, 10, 'xyz', 35)
-conf_too_high_detection = Detection('dirt', 0, 0, 100, 100, 'xyz', 61)
-conf_too_low_detection = Detection('dirt', 0, 0, 100, 100, 'xyz', 29)
+dirt_detection = d.ActiveLearnerDetection(Detection('dirt', 0, 0, 100, 100, 'xyz', .3))
+second_dirt_detection = Detection('dirt', 0, 20, 10, 10, 'xyz', .35)
+conf_too_high_detection = Detection('dirt', 0, 0, 100, 100, 'xyz', .61)
+conf_too_low_detection = Detection('dirt', 0, 0, 100, 100, 'xyz', .29)
 
 
 def test_learner_confidence():
@@ -83,21 +83,21 @@ def test_active_learner_extracts_from_json():
          "width": 37,
          "height": 24,
          "model_name": "some_weightfile",
-         "confidence": 30},
+         "confidence": .3},
         {"category_name": "obstacle",
          "x": 0,
          "y": 0,
          "width": 37,
          "height": 24,
          "model_name": "some_weightfile",
-         "confidence": 35},
+         "confidence": .35},
         {"category_name": "dirt",
          "x": 1479,
          "y": 862,
          "width": 14,
          "height": 11,
          "model_name": "some_weightfile",
-         "confidence": 20}]
+         "confidence": .2}]
 
     mac = '0000'
     learners = {mac: l.Learner()}

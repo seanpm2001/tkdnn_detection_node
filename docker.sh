@@ -6,6 +6,7 @@ then
     echo
     echo "  `basename $0` (b | build)        Build"
     echo "  `basename $0` (r | run)          Run"
+    echo "  `basename $0` (p | push)         Push"
     echo "  `basename $0` (d | rm)           Remove Container"
     echo "  `basename $0` (s | stop)         Stop"
     echo "  `basename $0` (k | kill)         Kill"
@@ -23,33 +24,55 @@ fi
 
 cmd=$1
 cmd_args=${@:2}
+
+image_name="zauberzeug/tkdnn-detection-node:nano-r32.5.0"
+container_name='tkdnn_detector'
+
+run_args=""
+run_args+="-v $(pwd)/detector:/app "
+run_args+="-v $HOME/data:/data "
+#run_args+="-v $HOME/learning_loop_node/learning_loop_node:/usr/local/lib/python3.6/dist-packages/learning_loop_node "
+run_args+="-e HOST=preview.learning-loop.ai "
+run_args+="-e ORGANIZATION=zauberzeug "
+run_args+="-e PROJECT=test "
+run_args+="--name $container_name "
+run_args+="--runtime=nvidia "
+run_args+="-e NVIDIA_VISIBLE_DEVICES=all "
+run_args+="-p 8004:80 "
+
+
 case $cmd in
     b | build)
-        docker kill tkdnn_detector
-        docker rm tkdnn_detector # remove existing container
-        docker build . --build-arg INSTALL_DEV=true -t zauberzeug/tkdnn-detection-node:nano-r32.5.0 $cmd_args
+        docker kill $container_name
+        docker rm $container_name # remove existing container
+        docker build . --target release -t $image_name $cmd_args
+        docker build . -t ${image_name}-dev $cmd_args
         ;;
     r | run)
-	    nvidia-docker run -it -v $(pwd)/detector:/app -v $HOME/data:/data -e HOST=preview.learning-loop.ai -e ORGANIZATION=zauberzeug -e PROJECT=test --rm --name tkdnn_detector --runtime=nvidia -e NVIDIA_VISIBLE_DEVICES=all -p 8004:80 zauberzeug/tkdnn-detection-node:nano-r32.5.0 $cmd_args
+	    nvidia-docker run -it --rm $run_args ${image_name}-dev $cmd_args
+        ;;
+    p | push)
+        docker push ${image_name}-dev 
+        docker push $image_name
         ;;
     s | stop)
-        docker stop tkdnn_detector $cmd_args
+        docker stop $container_name $cmd_args
         ;;
     k | kill)
-        docker kill tkdnn_detector $cmd_args
+        docker kill $container_name $cmd_args
         ;;
     d | rm)
-        docker kill tkdnn_detector
-        docker rm tkdnn_detector $cmd_args
+        docker kill $container_name
+        docker rm $container_name $cmd_args
         ;;
     l | log | logs)
-        docker logs -f --tail 100 $cmd_args tkdnn_detector
+        docker logs -f --tail 100 $cmd_args $container_name
         ;;
     e | exec)
-        docker exec $cmd_args tkdnn_detector
+        docker exec $cmd_args $container_name
         ;;
     a | attach)
-        docker exec -it $cmd_args tkdnn_detector /bin/bash
+        docker exec -it $cmd_args $container_name /bin/bash
         ;;
     *)
         echo "Unsupported command \"$cmd\""

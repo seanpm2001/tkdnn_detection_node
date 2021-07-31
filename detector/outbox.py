@@ -3,7 +3,6 @@ from glob import glob
 from fastapi.encoders import jsonable_encoder
 import aiofiles
 import os
-from filelock import FileLock
 from icecream import ic
 from fastapi.datastructures import UploadFile
 from detection import Detection

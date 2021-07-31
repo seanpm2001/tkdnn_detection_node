@@ -13,13 +13,13 @@ It is intended to run on NVidia Jetson (>= r32.4.4) by utilizing TKDNN.
 Runs only on NVidia Jetson (Tegra Architecture).
 
 ```bash
-docker pull zauberzeug/tkdnn_detection_node:latest # to make sure we have the latest image
+docker pull zauberzeug/tkdnn_detection_node:nano-r32.5.0 # to make sure we have the latest image
 docker run -it --rm --runtime=nvidia -p 80:80 \
--v $(pwd)/data:/data \          # bind the model to make it persistent (should contain an model.rt file)
+-v $HOME/data:/data \          # bind the model to make it persistent (should contain an model.rt file)
 -e NVIDIA_VISIBLE_DEVICES=all \ # to enable hardware acceleration
 -e ORGANIZATION=zauberzeug \    # define your organization
 -e PROJECT=demo\                # define the project for which the detector should run
-zauberzeug/tkdnn_detection_node:latest
+zauberzeug/tkdnn_detection_node:nano-r32.5.0
 ```
 
 If the container is up and running you can get detections through the RESTful API:
@@ -27,6 +27,10 @@ If the container is up and running you can get detections through the RESTful AP
 ```bash
 curl --request POST -H 'mac: FF:FF' -F 'file=@test.jpg' localhost/detect
 ```
+
+### Model Files
+
+For startup the image expects a valid `model.rt` file, `training.cfg` and `names.txt` in the `/data` directory. These will automatically provided by converter nodes.
 
 ## Development
 

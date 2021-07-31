@@ -1,7 +1,7 @@
 from typing import List
-from detector.active_learner import detection as d
+from active_learner import detection as d
 from icecream import ic
-from detector.detection import Detection
+from detection import Detection
 
 
 class Learner:

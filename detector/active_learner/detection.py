@@ -1,4 +1,4 @@
-from detector.detection import Detection
+from detection import Detection
 from datetime import datetime, timedelta
 
 

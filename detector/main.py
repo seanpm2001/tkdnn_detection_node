@@ -9,14 +9,17 @@ from fastapi.responses import JSONResponse
 from icecream import ic
 from fastapi_utils.tasks import repeat_every
 from fastapi_socketio import SocketManager
-from detector.tkdnn import Detector
-from detector.outbox import Outbox
-from detector.detection import Detection
-from detector.active_learner import learner as l
-from detector import helper
+from tkdnn import Detector
+from outbox import Outbox
+from detection import Detection
+from active_learner import learner as l
+import helper
 import asyncio
 from datetime import datetime
 from threading import Thread
+import logging
+
+logging.getLogger().setLevel(logging.INFO)
 
 
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')

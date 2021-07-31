@@ -2,11 +2,11 @@ import cv2
 from typing import List, Any
 from typing import Union as UNION
 from icecream import ic
-from detector.detection import Detection
+from detection import Detection
 from ctypes import *
-import detector.c_classes as c_classes
+import c_classes as c_classes
 import logging
-from detector.helper import measure
+from helper import measure
 
 
 lib = CDLL("/usr/local/lib/libdarknetRT.so", RTLD_GLOBAL)
@@ -37,12 +37,15 @@ class Detector():
 
         with open('/data/names.txt', 'r') as f:
             self.classes = f.read().rstrip('\n').split('\n')
+        logging.info(f'Using {self.classes}')
 
         try:
             self.net = load_network('/data/model.rt'.encode("ascii"), len(self.classes), 1)
         except Exception:
             logging.exception(f'could not load model')
             raise
+
+        logging.info('loaded /data/model.rt')
 
         with open('/data/training.cfg', 'r') as f:
             for l in f.readlines():

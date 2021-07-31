@@ -6,7 +6,7 @@ import os
 from filelock import FileLock
 from icecream import ic
 from fastapi.datastructures import UploadFile
-from detector.detection import Detection
+from detection import Detection
 from typing import List, Any
 import json
 from datetime import datetime

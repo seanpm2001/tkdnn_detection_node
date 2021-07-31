@@ -22,12 +22,10 @@ COPY ./pyproject.toml ./poetry.lock* ./
 ARG INSTALL_DEV=false
 RUN bash -c "if [ $INSTALL_DEV == 'true' ] ; then poetry install --no-root ; else poetry install --no-root --no-dev ; fi"
 
-COPY ./ ./
+COPY ./start.sh /start.sh
+ADD ./detector /app
 ENV PYTHONPATH=/app
-RUN ln -s /app/data /data
 
 EXPOSE 80
 
-ENV HOST=https://learning-loop.ai
-
-CMD ["/app/start.sh"]
+CMD ["/start.sh"]

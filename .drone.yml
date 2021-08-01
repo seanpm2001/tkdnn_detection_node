@@ -13,7 +13,7 @@ steps:
       - name: docker_sock
         path: /var/run/docker.sock
     commands:
-      - "docker build --build-arg MAKEFLAGS=-j6 -t zauberzeug/tkdnn-detection-node:nano-r32.5.0 ."
+      - "./docker.sh build"
 
   - name: publish
     image: docker
@@ -25,7 +25,7 @@ steps:
         path: /var/run/docker.sock
     commands:
       - "docker -D login -u zauberzeug -p $PASSWORD"
-      - "docker push zauberzeug/tkdnn-detection-node:nano-r32.5.0"
+      - "./docker.sh push"
 
   - name: readme
     image: chko/docker-pushrm:1

@@ -8,15 +8,16 @@ platform:
 
 steps:
   - name: build
-    image: docker
+    image: docker:dind
     volumes:
       - name: docker_sock
         path: /var/run/docker.sock
     commands:
-      - "./docker.sh build"
+      - "docker build . -t zauberzeug/tkdnn-detection-node:nano-r32.5.0"
+      - "docker build . -t zauberzeug/tkdnn-detection-node:nano-r32.5.0-dev"
 
   - name: publish
-    image: docker
+    image: docker:dind
     environment:
       PASSWORD:
         from_secret: zauberzeug_docker_password
@@ -25,7 +26,8 @@ steps:
         path: /var/run/docker.sock
     commands:
       - "docker -D login -u zauberzeug -p $PASSWORD"
-      - "./docker.sh push"
+      - "docker push zauberzeug/tkdnn-detection-node:nano-r32.5.0"
+      - "docker push zauberzeug/tkdnn-detection-node:nano-r32.5.0-dev"
 
   - name: readme
     image: chko/docker-pushrm:1

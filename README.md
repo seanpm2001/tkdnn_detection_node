@@ -25,7 +25,7 @@ zauberzeug/tkdnn_detection_node:nano-r32.5.0
 If the container is up and running you can get detections through the RESTful API:
 
 ```bash
-curl --request POST -H 'mac: FF:FF' -F 'file=@test.jpg' localhost/detect
+curl --request POST -H 'mac: FF:FF:FF:FF:FF' -F 'file=@test.jpg' localhost/detect
 ```
 
 ### Model Files

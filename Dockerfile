@@ -20,6 +20,8 @@ ENV PYTHONPATH=/app
 
 EXPOSE 80
 
+ENV HOST=learning-loop.ai
+
 CMD ["/start.sh"]
 
 FROM release

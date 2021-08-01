@@ -23,7 +23,8 @@ class Outbox():
         if not os.path.exists(self.path):
             os.makedirs(self.path)
 
-        base = os.environ.get('SERVER_BASE_URL')
+        host = os.environ.get('HOST', 'learning-loop.ai')
+        base: str = f'http{"s" if host != "backend" else ""}://' + host
         o = os.environ.get('ORGANIZATION')
         p = os.environ.get('PROJECT')
         self.target_uri = f'{base}/api/{o}/projects/{p}/images'
@@ -52,8 +53,8 @@ class Outbox():
 
         try:
             for item in self.get_data_files():
-                data = [('file', open(f'{item}/image.json', 'r')),
-                        ('file', open(f'{item}/image.jpg', 'rb'))]
+                data = [('files', open(f'{item}/image.json', 'r')),
+                        ('files', open(f'{item}/image.jpg', 'rb'))]
 
                 response = requests.post(self.target_uri, files=data)
                 if response.status_code == 200:

@@ -35,19 +35,20 @@ class Detector():
 
     def __init__(self):
 
-        with open('/data/names.txt', 'r') as f:
+        with open('/data/model/names.txt', 'r') as f:
             self.classes = f.read().rstrip('\n').split('\n')
         logging.info(f'Using {self.classes}')
 
+        model_path = '/data/model/model.rt'
         try:
-            self.net = load_network('/data/model.rt'.encode("ascii"), len(self.classes), 1)
+            self.net = load_network(model_path.encode("ascii"), len(self.classes), 1)
         except Exception:
-            logging.exception(f'could not load model')
+            logging.exception(f'could not load {model_path}')
             raise
 
-        logging.info('loaded /data/model.rt')
+        logging.info(f'loaded {model_path}')
 
-        with open('/data/training.cfg', 'r') as f:
+        with open('/data/model/training.cfg', 'r') as f:
             for l in f.readlines():
                 if l.startswith('width='):
                     width = int(l.split('=')[1])

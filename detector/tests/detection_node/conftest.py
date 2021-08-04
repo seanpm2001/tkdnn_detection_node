@@ -2,8 +2,8 @@ from logging import Logger
 from typing import Generator
 
 import socketio
-from detector.tkdnn import Detector
-from detector.outbox import Outbox
+from tkdnn import Detector
+from outbox import Outbox
 import pytest
 import os
 import asyncio
@@ -18,12 +18,13 @@ def detector():
     yield Detector()
 
 
-@pytest.fixture(scope='session')
+@pytest.fixture()
 def outbox():
     outbox = Outbox()
     shutil.rmtree(outbox.path)
     os.mkdir(outbox.path)
     yield outbox
+    shutil.rmtree(outbox.path)
 
 
 @pytest.fixture()

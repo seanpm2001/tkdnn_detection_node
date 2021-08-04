@@ -37,21 +37,30 @@ def reset_test_learner(request: Request):
 
 
 @router.post("/upload")
-async def upload_image(request: Request, files: List[UploadFile] = File(...)):
+async def upload_image(files: List[UploadFile] = File(...)):
+    loop = asyncio.get_event_loop()
     for file_data in files:
-        await outbox.write_file(file_data, file_data.filename)
+        await loop.run_in_executor(None, lambda: outbox.save(file_data, [], ['picked_by_system']))
 
     return 200, "OK"
 
 
 @node.sio.event
-async def detect(sid, data):
+async def upload(sid, data):
+    loop = asyncio.get_event_loop()
+    try:
+        await loop.run_in_executor(None, lambda: outbox.save(data['image'], [], ['picked_by_system']))
+    except Exception as e:
+        logging.exception('could not upload via socketio')
+        return {'error': str(e)}
 
+@node.sio.event
+async def detect(sid, data):
     try:
         np_image = np.frombuffer(data['image'], np.uint8)
-        return get_detections(np_image, data.get('mac', None), data.get('tags', []))
+        return await get_detections(np_image, data.get('mac', None), data.get('tags', []))
     except Exception as e:
-        helper.print_stacktrace()
+        logging.exception('could not detect via socketio')
         with open('/tmp/bad_img_from_socket_io.jpg', 'wb') as f:
             f.write(data['image'])
         return {'error': str(e)}
@@ -71,13 +80,15 @@ async def http_detect(request: Request, file: UploadFile = File(...), mac: str =
     except:
         raise Exception(f'Uploaded file {file.filename} is no image file.')
 
-    return JSONResponse(get_detections(np_image, mac, tags.split(',') if tags else []))
+    return JSONResponse(await get_detections(np_image, mac, tags.split(',') if tags else []))
 
 
-def get_detections(np_image, mac: str, tags: str):
-    image = cv2.imdecode(np_image, cv2.IMREAD_COLOR)
-    detections = detector.evaluate(image)
-
+async def get_detections(np_image, mac: str, tags: str):
+    loop = asyncio.get_event_loop()
+    image = await loop.run_in_executor(None, lambda: cv2.imdecode(np_image, cv2.IMREAD_COLOR))
+    detections = await loop.run_in_executor(None, lambda: detector.evaluate(image))
+    info = "\n    ".join([str(d) for d in detections])
+    logging.info('detected:\n    ' + info)
     thread = Thread(target=learn, args=(detections, mac, tags, image))
     thread.start()
     return {'box_detections': jsonable_encoder(detections)}

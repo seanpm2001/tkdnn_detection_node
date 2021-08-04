@@ -30,7 +30,7 @@ class Outbox():
         self.target_uri = f'{base}/api/{o}/projects/{p}/images'
         self.upload_in_progress = False
 
-    def save(self, cv_image, detections: List[Detection], tags: List[str]) -> None:
+    def save(self, image, detections: List[Detection] = [], tags: List[str] = []) -> None:
         id = datetime.now().isoformat(sep='_', timespec='milliseconds')
         tmp = f'/data/tmp/{id}'
         os.makedirs(tmp, exist_ok=True)
@@ -40,7 +40,11 @@ class Outbox():
                 'tags': tags,
                 'date': id,
             }, f)
-        cv2.imwrite(tmp + '/image.jpg', cv_image)
+        try:
+            cv2.imwrite(tmp + '/image.jpg', image)
+        except:
+            with open(tmp + '/image.jpg', 'wb') as f:
+                f.write(image)
         os.rename(tmp, self.path + '/' + id)  # NOTE rename is atomic so upload can run in parallel
 
     def get_data_files(self):

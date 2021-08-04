@@ -1,11 +1,11 @@
 # Learner Tests incoming
 from datetime import datetime, timedelta
 import pytest
-from detector.active_learner import detection as d
-from detector.active_learner import learner as l
+from active_learner import detection as d
+from active_learner import learner as l
 from icecream import ic
 import time
-from detector.detection import Detection
+from detection import Detection
 
 dirt_detection = d.ActiveLearnerDetection(Detection('dirt', 0, 0, 100, 100, 'xyz', .3))
 second_dirt_detection = Detection('dirt', 0, 20, 10, 10, 'xyz', .35)

@@ -2,10 +2,10 @@ import json
 from glob import glob
 
 import socketio
-import detector.helper as helper
 import asyncio
-from detector.active_learner.learner import Learner
-from detector.outbox import Outbox
+import helper as helper
+from active_learner.learner import Learner
+from outbox import Outbox
 from pydantic.types import Json
 import requests
 import json

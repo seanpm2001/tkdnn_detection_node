@@ -9,7 +9,7 @@ RUN python3 -m pip install --upgrade pip
 # fixing pyYAML upgrade error (see https://stackoverflow.com/a/53534728/364388)
 RUN python3 -m pip install --no-cache-dir --ignore-installed PyYAML
 # installing dependencies
-RUN python3 -m pip install --no-cache-dir "uvicorn[standard]" async_generator aiofiles psutil
+RUN python3 -m pip install --no-cache-dir "uvicorn[standard]" async_generator aiofiles psutil pillow
 RUN python3 -m pip install --no-cache-dir "learning-loop-node==0.2.8"
 
 WORKDIR /app/

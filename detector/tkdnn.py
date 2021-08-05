@@ -7,7 +7,8 @@ from ctypes import *
 import c_classes as c_classes
 import logging
 from helper import measure
-
+from learning_loop_node.detector.about import About
+import json
 
 lib = CDLL("/usr/local/lib/libdarknetRT.so", RTLD_GLOBAL)
 
@@ -34,30 +35,20 @@ get_network_boxes.restype = POINTER(c_classes.DETECTION)
 class Detector():
 
     def __init__(self):
-
-        with open('/data/model/names.txt', 'r') as f:
-            self.classes = f.read().rstrip('\n').split('\n')
-        logging.info(f'Using {self.classes}')
+        with open('/data/model/model.json', 'r') as f:
+            self.about = About.parse_obj(json.load(f))
+        logging.info(f'Using {self.about}')
 
         model_path = '/data/model/model.rt'
         try:
-            self.net = load_network(model_path.encode("ascii"), len(self.classes), 1)
+            self.net = load_network(model_path.encode("ascii"), len(self.about.categories), 1)
         except Exception:
             logging.exception(f'could not load {model_path}')
             raise
 
         logging.info(f'loaded {model_path}')
 
-        with open('/data/model/training.cfg', 'r') as f:
-            for l in f.readlines():
-                if l.startswith('width='):
-                    width = int(l.split('=')[1])
-                if l.startswith('height='):
-                    height = int(l.split('=')[1])
-
-            self.image = make_image(width, height, 3)
-
-        self.model_id = 'unknown model'  # TODO see https://trello.com/c/C2HJ0g01/174-tensorrt-file-f%C3%BCr-tkdnn-detector-deployen
+        self.image = make_image(self.about.resolution, self.about.resolution, 3)
 
     def evaluate(self, image: Any) -> List[Detection]:
         resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
@@ -79,7 +70,7 @@ class Detector():
             d.name.decode("ascii"),
             int(d.bbox.x * w_ratio), int(d.bbox.y * h_ratio),
             int(d.bbox.w * w_ratio), int(d.bbox.h * h_ratio),
-            self.model_id, round(d.prob, 2)
+            self.about.version, round(d.prob, 2)
         ) for d in detections]
 
         return detections

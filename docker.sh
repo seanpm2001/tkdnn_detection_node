@@ -31,7 +31,7 @@ container_name='tkdnn_detector'
 run_args=""
 run_args+="-v $(pwd)/detector:/app "
 run_args+="-v $HOME/data:/data "
-#run_args+="-v $HOME/learning_loop_node/learning_loop_node:/usr/local/lib/python3.6/dist-packages/learning_loop_node "
+run_args+="-v $HOME/learning_loop_node/learning_loop_node:/usr/local/lib/python3.6/dist-packages/learning_loop_node "
 run_args+="-e HOST=preview.learning-loop.ai "
 run_args+="-e ORGANIZATION=zauberzeug "
 run_args+="-e PROJECT=test "

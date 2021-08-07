@@ -9,7 +9,7 @@ from icecream import ic
 from fastapi_utils.tasks import repeat_every
 from fastapi_socketio import SocketManager
 import data  # import before DetectorNode
-from tkdnn import Detector
+from tkdnn import Tkdnn
 from outbox import Outbox
 from detection import Detection
 from active_learner import learner as l
@@ -89,7 +89,7 @@ async def http_detect(request: Request, file: UploadFile = File(...), mac: str =
 async def get_detections(np_image, mac: str, tags: str):
     loop = asyncio.get_event_loop()
     image = await loop.run_in_executor(None, lambda: cv2.imdecode(np_image, cv2.IMREAD_COLOR))
-    detections = await loop.run_in_executor(None, lambda: detector.evaluate(image))
+    detections = await loop.run_in_executor(None, lambda: tkdnn.evaluate(image))
     info = "\n    ".join([str(d) for d in detections])
     logging.info('detected:\n    ' + info)
     thread = Thread(target=learn, args=(detections, mac, tags, image))
@@ -118,9 +118,9 @@ def check_detections_for_active_learning(detections: List[Detection], mac: str) 
 
 
 @node.on_event("startup")
-def create_detector():
-    global detector
-    detector = Detector(about)
+def load_model():
+    global tkdnn
+    tkdnn = Tkdnn(about)
 
 
 @node.on_event("startup")

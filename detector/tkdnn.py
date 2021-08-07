@@ -32,7 +32,7 @@ get_network_boxes.argtypes = [c_void_p, c_float, POINTER(c_int)]
 get_network_boxes.restype = POINTER(c_classes.DETECTION)
 
 
-class Detector():
+class Tkdnn():
 
     def __init__(self, about: About):
         

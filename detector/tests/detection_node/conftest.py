@@ -4,6 +4,7 @@ from typing import Generator
 import socketio
 from tkdnn import Detector
 from outbox import Outbox
+import data
 import pytest
 import os
 import asyncio
@@ -14,8 +15,8 @@ import shutil
 @pytest.fixture(scope='session')
 def detector():
     assert os.path.exists(
-        '/data/model.rt'), "Error: Could not find model. You need to execute 'detection_node % ./download_model_for_testing.sh'"
-    yield Detector()
+        '/data/model/model.rt'), "Error: Could not find model. You need to execute 'detection_node % ./download_model_for_testing.sh'"
+    yield Detector(data.ensure_model())
 
 
 @pytest.fixture()

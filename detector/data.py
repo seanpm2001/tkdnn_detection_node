@@ -11,7 +11,8 @@ def ensure_model():
         about = About.parse_obj(json.load(f))
         logging.info(f'Using {about}')
 
-    os.environ['HOST'] = about.host
+    # NOTE environment var HOST is expected to not contain the protocol
+    os.environ['HOST'] = about.host.replace('https://', '').replace('http://', '')
     os.environ['ORGANIZATION'] = about.organization
     os.environ['PROJECT'] = about.project
 

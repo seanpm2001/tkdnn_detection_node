@@ -25,7 +25,6 @@ icecream.install()
 logging.getLogger().setLevel(logging.INFO)
 
 about = data.ensure_model()
-detector = Detector(about)
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
 sio = SocketManager(app=node)
 outbox = Outbox()
@@ -116,6 +115,12 @@ def check_detections_for_active_learning(detections: List[Detection], mac: str) 
 
     active_learning_causes = learners[mac].add_detections(detections)
     return active_learning_causes
+
+
+@node.on_event("startup")
+def create_detector():
+    global detector
+    detector = Detector(about)
 
 
 @node.on_event("startup")

@@ -1,7 +1,6 @@
 import uvicorn
 from fastapi import APIRouter, Request, File, UploadFile, Header
 from fastapi.encoders import jsonable_encoder
-from learning_loop_node import DetectorNode
 from typing import Optional, List, Any
 import cv2
 import numpy as np
@@ -9,22 +8,26 @@ from fastapi.responses import JSONResponse
 from icecream import ic
 from fastapi_utils.tasks import repeat_every
 from fastapi_socketio import SocketManager
+import data  # import before DetectorNode
 from tkdnn import Detector
 from outbox import Outbox
 from detection import Detection
 from active_learner import learner as l
+from learning_loop_node import DetectorNode
 import helper
 import asyncio
 from datetime import datetime
 from threading import Thread
 import logging
+import icecream
+icecream.install()
 
 logging.getLogger().setLevel(logging.INFO)
 
-
+about = data.ensure_model()
+detector = Detector(about)
 node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
 sio = SocketManager(app=node)
-detector = Detector()
 outbox = Outbox()
 router = APIRouter()
 learners = {}
@@ -53,6 +56,7 @@ async def upload(sid, data):
     except Exception as e:
         logging.exception('could not upload via socketio')
         return {'error': str(e)}
+
 
 @node.sio.event
 async def detect(sid, data):

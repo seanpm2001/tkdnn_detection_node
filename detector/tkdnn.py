@@ -1,3 +1,4 @@
+from learning_loop_node.detector.about import About
 import cv2
 from typing import List, Any
 from typing import Union as UNION
@@ -7,8 +8,7 @@ from ctypes import *
 import c_classes as c_classes
 import logging
 from helper import measure
-from learning_loop_node.detector.about import About
-import json
+import os
 
 lib = CDLL("/usr/local/lib/libdarknetRT.so", RTLD_GLOBAL)
 
@@ -34,21 +34,19 @@ get_network_boxes.restype = POINTER(c_classes.DETECTION)
 
 class Detector():
 
-    def __init__(self):
-        with open('/data/model/model.json', 'r') as f:
-            self.about = About.parse_obj(json.load(f))
-        logging.info(f'Using {self.about}')
-
-        model_path = '/data/model/model.rt'
+    def __init__(self, about: About):
+        
+        model_file = '/data/model/model.rt'
         try:
-            self.net = load_network(model_path.encode("ascii"), len(self.about.categories), 1)
+            self.net = load_network(model_file.encode("ascii"), len(about.categories), 1)
         except Exception:
-            logging.exception(f'could not load {model_path}')
+            logging.exception(f'could not load {model_file}')
             raise
 
-        logging.info(f'loaded {model_path}')
+        logging.info(f'loaded {model_file}')
 
-        self.image = make_image(self.about.resolution, self.about.resolution, 3)
+        self.image = make_image(about.resolution, about.resolution, 3)
+        self.version = about.version
 
     def evaluate(self, image: Any) -> List[Detection]:
         resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
@@ -70,7 +68,7 @@ class Detector():
             d.name.decode("ascii"),
             int(d.bbox.x * w_ratio), int(d.bbox.y * h_ratio),
             int(d.bbox.w * w_ratio), int(d.bbox.h * h_ratio),
-            self.about.version, round(d.prob, 2)
+            self.version, round(d.prob, 2)
         ) for d in detections]
 
         return detections

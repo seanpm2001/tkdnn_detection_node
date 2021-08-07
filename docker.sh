@@ -22,6 +22,9 @@ then
     exit
 fi
 
+# sourcing .env file to get configuration (see README.md)
+. .env || echo "you should provide an .env file with USERNAME and PASSWORD for the Learning Loop"
+
 cmd=$1
 cmd_args=${@:2}
 
@@ -32,9 +35,10 @@ run_args=""
 run_args+="-v $(pwd)/detector:/app "
 run_args+="-v $HOME/data:/data "
 run_args+="-v $HOME/learning_loop_node/learning_loop_node:/usr/local/lib/python3.6/dist-packages/learning_loop_node "
-run_args+="-e HOST=preview.learning-loop.ai "
+run_args+="-e HOST=learning-loop.ai "
 run_args+="-e ORGANIZATION=zauberzeug "
-run_args+="-e PROJECT=test "
+run_args+="-e PROJECT=drawingbot "
+run_args+="-e USERNAME=$USERNAME -e PASSWORD=$PASSWORD "
 run_args+="--name $container_name "
 run_args+="--runtime=nvidia "
 run_args+="-e NVIDIA_VISIBLE_DEVICES=all "

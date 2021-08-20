@@ -46,6 +46,9 @@ async def upload_image(files: List[UploadFile] = File(...)):
 
     return 200, "OK"
 
+@node.sio.event
+async def info(sid):
+    return jsonable_encoder(about.dict())
 
 @node.sio.event
 async def upload(sid, data):

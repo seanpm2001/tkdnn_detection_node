@@ -49,26 +49,29 @@ class Tkdnn():
         self.version = about.version
 
     def evaluate(self, image: Any) -> List[Detection]:
-        resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
-        resized_data = resized.ctypes.data_as(c_char_p)
-        copy_image_from_bytes(self.image, resized_data)
+        try:
+            resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
+            resized_data = resized.ctypes.data_as(c_char_p)
+            copy_image_from_bytes(self.image, resized_data)
 
-        num = c_int(0)
-        pnum = pointer(num)
-        do_inference(self.net, self.image)
-        threshold = 0.2  # TODO make this configurable thorugh REST call
-        detections = get_network_boxes(self.net, threshold, pnum)
-        detections = [detections[i] for i in range(pnum[0])]  # convert c to python
+            num = c_int(0)
+            pnum = pointer(num)
+            do_inference(self.net, self.image)
+            threshold = 0.2  # TODO make this configurable thorugh REST call
+            detections = get_network_boxes(self.net, threshold, pnum)
+            detections = [detections[i] for i in range(pnum[0])]  # convert c to python
 
-        (h, w, _) = image.shape
-        w_ratio = w/self.image.w
-        h_ratio = h/self.image.h
+            (h, w, _) = image.shape
+            w_ratio = w/self.image.w
+            h_ratio = h/self.image.h
 
-        detections = [Detection(
-            d.name.decode("ascii"),
-            int(d.bbox.x * w_ratio), int(d.bbox.y * h_ratio),
-            int(d.bbox.w * w_ratio), int(d.bbox.h * h_ratio),
-            self.version, round(d.prob, 2)
-        ) for d in detections]
-
-        return detections
+            detections = [Detection(
+                d.name.decode("ascii"),
+                int(d.bbox.x * w_ratio), int(d.bbox.y * h_ratio),
+                int(d.bbox.w * w_ratio), int(d.bbox.h * h_ratio),
+                self.version, round(d.prob, 2)
+            ) for d in detections]
+            return detections
+        except:
+            logging.exception('tkdnn inference failed')
+            return []

@@ -64,7 +64,7 @@ async def upload(sid, data):
 async def detect(sid, data):
     try:
         np_image = np.frombuffer(data['image'], np.uint8)
-        return await get_detections(np_image, data.get('mac', None), data.get('tags', []))
+        return await get_detections(np_image, data.get('mac', None), data.get('tags', []), data.get('active_learning', True))
     except Exception as e:
         logging.exception('could not detect via socketio')
         with open('/tmp/bad_img_from_socket_io.jpg', 'wb') as f:
@@ -89,14 +89,15 @@ async def http_detect(request: Request, file: UploadFile = File(...), mac: str =
     return JSONResponse(await get_detections(np_image, mac, tags.split(',') if tags else []))
 
 
-async def get_detections(np_image, mac: str, tags: str):
+async def get_detections(np_image, mac: str, tags: str, active_learning=True):
     loop = asyncio.get_event_loop()
     image = await loop.run_in_executor(None, lambda: cv2.imdecode(np_image, cv2.IMREAD_COLOR))
     detections = await loop.run_in_executor(None, lambda: tkdnn.evaluate(image))
     info = "\n    ".join([str(d) for d in detections])
     logging.info('detected:\n    ' + info)
-    thread = Thread(target=learn, args=(detections, mac, tags, image))
-    thread.start()
+    if active_learning:
+        thread = Thread(target=learn, args=(detections, mac, tags, image))
+        thread.start()
     return {'box_detections': jsonable_encoder(detections)}
 
 

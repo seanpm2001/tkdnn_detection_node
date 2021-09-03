@@ -37,3 +37,5 @@ RUN $VSCODE_SERVER --install-extension ms-python.vscode-pylance \
     $VSCODE_SERVER --install-extension himanoa.python-autopep8 \
     $VSCODE_SERVER --install-extension esbenp.prettier-vscode \
     $VSCODE_SERVER --install-extension littlefoxteam.vscode-python-test-adapter
+
+ENV PYTHONFAULTHANDLER=1

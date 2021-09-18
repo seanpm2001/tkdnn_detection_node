@@ -64,6 +64,9 @@ class Outbox():
                 if response.status_code == 200:
                     shutil.rmtree(item)
                     logging.info(f'uploaded {item} successfully')
+                elif response.status_code == 422:
+                    logging.error(f'Broken content in {item}: dropping this data')
+                    shutil.rmtree(item)                    
                 else:
                     logging.error(f'Could not upload {item}: {response.status_code}, {response.content}')
         except:

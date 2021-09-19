@@ -94,7 +94,7 @@ async def get_detections(np_image, mac: str, tags: str, active_learning=True):
     image = await loop.run_in_executor(None, lambda: cv2.imdecode(np_image, cv2.IMREAD_COLOR))
     detections = await loop.run_in_executor(None, lambda: tkdnn.evaluate(image))
     info = "\n    ".join([str(d) for d in detections])
-    logging.info('detected:\n    ' + info)
+    logging.debug('detected:\n    ' + info)
     if active_learning:
         thread = Thread(target=learn, args=(detections, mac, tags, image))
         thread.start()

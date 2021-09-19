@@ -12,7 +12,7 @@ def ensure_model():
         logging.info(f'Using {about}')
 
     # NOTE environment var HOST is expected to not contain the protocol
-    os.environ['HOST'] = about.host.replace('https://', '').replace('http://', '')
+    os.environ['HOST'] = about.host.replace('https://', '').replace('http://', '').strip('/')
     os.environ['ORGANIZATION'] = about.organization
     os.environ['PROJECT'] = about.project
 

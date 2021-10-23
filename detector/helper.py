@@ -5,7 +5,6 @@ import sys
 
 
 def measure(reset: bool = False):
-
     global t
     if 't' in globals() and not reset:
         dt = time.time() - t
@@ -17,7 +16,6 @@ def measure(reset: bool = False):
 
 
 def print_stacktrace():
-
     print("-" * 60)
     traceback.print_exc(file=sys.stdout)
     print("-" * 60, flush=True)

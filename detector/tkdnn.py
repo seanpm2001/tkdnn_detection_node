@@ -35,7 +35,6 @@ get_network_boxes.restype = POINTER(c_classes.DETECTION)
 class Tkdnn():
 
     def __init__(self, about: About):
-        
         model_file = '/data/model/model.rt'
         try:
             self.net = load_network(model_file.encode("ascii"), len(about.categories), 1)

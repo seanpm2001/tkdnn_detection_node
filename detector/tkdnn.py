@@ -1,4 +1,4 @@
-from learning_loop_node.detector.about import About
+from learning_loop_node.model_information import ModelInformation
 import cv2
 from typing import List, Any
 from typing import Union as UNION
@@ -34,19 +34,19 @@ get_network_boxes.restype = POINTER(c_classes.DETECTION)
 
 class Tkdnn():
 
-    def __init__(self, about: About):
+    def __init__(self, model: ModelInformation):
         
         model_file = '/data/model/model.rt'
         try:
-            self.net = load_network(model_file.encode("ascii"), len(about.categories), 1)
+            self.net = load_network(model_file.encode("ascii"), len(model.categories), 1)
         except Exception:
             logging.exception(f'could not load {model_file}')
             raise
 
         logging.info(f'loaded {model_file}')
 
-        self.image = make_image(about.resolution, about.resolution, 3)
-        self.version = about.version
+        self.image = make_image(model.resolution, model.resolution, 3)
+        self.version = model.version
 
     def evaluate(self, image: Any) -> List[Detection]:
         try:

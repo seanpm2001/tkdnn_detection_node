@@ -10,7 +10,7 @@ RUN python3 -m pip install --upgrade pip
 RUN python3 -m pip install --no-cache-dir --ignore-installed PyYAML
 # installing dependencies
 RUN python3 -m pip install --no-cache-dir "uvicorn[standard]" async_generator aiofiles psutil pillow
-RUN python3 -m pip install --no-cache-dir "learning-loop-node==0.3.10"
+RUN python3 -m pip install --no-cache-dir "learning-loop-node==0.4.5"
 
 WORKDIR /app/
 

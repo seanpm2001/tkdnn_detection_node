@@ -22,11 +22,16 @@ def detector():
 @pytest.fixture()
 def outbox():
     outbox = Outbox()
-    shutil.rmtree(outbox.path)
+    try:
+        shutil.rmtree(outbox.path)
+    except:
+        pass
     os.mkdir(outbox.path)
     yield outbox
-    shutil.rmtree(outbox.path)
-
+    try:
+        shutil.rmtree(outbox.path)
+    except:
+        pass
 
 @pytest.fixture()
 async def sio() -> Generator:

@@ -11,7 +11,7 @@ from fastapi_socketio import SocketManager
 import data  # import before DetectorNode
 from tkdnn import Tkdnn
 from outbox import Outbox
-from detection import Detection
+from detections import Detections
 from active_learner import learner as l
 from learning_loop_node import DetectorNode
 import helper
@@ -93,7 +93,7 @@ async def get_detections(np_image, mac: str, tags: str, active_learning=True):
     loop = asyncio.get_event_loop()
     image = await loop.run_in_executor(None, lambda: cv2.imdecode(np_image, cv2.IMREAD_COLOR))
     detections = await loop.run_in_executor(None, lambda: tkdnn.evaluate(image))
-    info = "\n    ".join([str(d) for d in detections])
+    info = "\n    ".join([str(d) for d in detections.box_detections])
     logging.debug('detected:\n    ' + info)
     if active_learning:
         thread = Thread(target=learn, args=(detections, mac, tags, image))
@@ -101,7 +101,7 @@ async def get_detections(np_image, mac: str, tags: str, active_learning=True):
     return {'box_detections': jsonable_encoder(detections)}
 
 
-def learn(detections: List[Detection], mac: str, tags: Optional[str], cv_image) -> None:
+def learn(detections: Detections, mac: str, tags: Optional[str], cv_image) -> None:
     active_learning_causes = check_detections_for_active_learning(detections, mac)
 
     if any(active_learning_causes):
@@ -111,7 +111,7 @@ def learn(detections: List[Detection], mac: str, tags: Optional[str], cv_image) 
         outbox.save(cv_image, detections, tags)
 
 
-def check_detections_for_active_learning(detections: List[Detection], mac: str) -> List[str]:
+def check_detections_for_active_learning(detections: Detections, mac: str) -> List[str]:
     global learners
     {learner.forget_old_detections() for (mac, learner) in learners.items()}
     if mac not in learners:

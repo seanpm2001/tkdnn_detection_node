@@ -1,12 +1,15 @@
-from learning_loop_node.model_information import ModelInformation
+from learning_loop_node.model_information import CategoryType, ModelInformation
 import cv2
 from typing import List, Any
 from typing import Union as UNION
 from icecream import ic
-from detection import Detection
+from detections import Detections
+from box_detection import BoxDetection
+from point_detection import PointDetection
 from ctypes import *
 import c_classes as c_classes
 import logging
+from detections import Detections
 from helper import measure
 import os
 
@@ -35,7 +38,6 @@ get_network_boxes.restype = POINTER(c_classes.DETECTION)
 class Tkdnn():
 
     def __init__(self, model: ModelInformation):
-        
         model_file = '/data/model/model.rt'
         try:
             self.net = load_network(model_file.encode("ascii"), len(model.categories), 1)
@@ -47,8 +49,10 @@ class Tkdnn():
 
         self.image = make_image(model.resolution, model.resolution, 3)
         self.version = model.version
+        self.category_types = {c.name : c.type for c in  model.categories}
 
-    def evaluate(self, image: Any) -> List[Detection]:
+    def evaluate(self, image: Any) -> Detections:
+        detections = Detections()
         try:
             resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
             resized_data = resized.ctypes.data_as(c_char_p)
@@ -58,20 +62,29 @@ class Tkdnn():
             pnum = pointer(num)
             do_inference(self.net, self.image)
             threshold = 0.2  # TODO make this configurable thorugh REST call
-            detections = get_network_boxes(self.net, threshold, pnum)
-            detections = [detections[i] for i in range(pnum[0])]  # convert c to python
+            boxes = get_network_boxes(self.net, threshold, pnum)
+            boxes = [boxes[i] for i in range(pnum[0])]  # convert c to python
 
             (h, w, _) = image.shape
             w_ratio = w/self.image.w
             h_ratio = h/self.image.h
 
-            detections = [Detection(
-                d.name.decode("ascii"),
-                int(d.bbox.x * w_ratio), int(d.bbox.y * h_ratio),
-                int(d.bbox.w * w_ratio), int(d.bbox.h * h_ratio),
-                self.version, round(d.prob, 2)
-            ) for d in detections]
-            return detections
+            for box in boxes:
+                if self.category_types[box.name] == CategoryType.Box:
+                    detections.box_detections.add(BoxDetection(
+                        box.name.decode("ascii"),
+                        int(box.bbox.x * w_ratio), int(box.bbox.y * h_ratio),
+                        int(box.bbox.w * w_ratio), int(box.bbox.h * h_ratio),
+                        self.version, round(box.prob, 2)
+                    ))
+                elif self.category_types[box.name] == CategoryType.Point:
+                    detections.box_detections.add(PointDetection(
+                        box.name.decode("ascii"),
+                        int(box.bbox.x * w_ratio), int(box.bbox.y * h_ratio),
+                        int(box.bbox.w * w_ratio), int(box.bbox.h * h_ratio),
+                        self.version, round(box.prob, 2)
+                    ))
         except:
             logging.exception('tkdnn inference failed')
-            return []
+
+        return detections

@@ -70,18 +70,20 @@ class Tkdnn():
             h_ratio = h/self.image.h
 
             for box in boxes:
-                if self.category_types[box.name] == CategoryType.Box:
-                    detections.box_detections.add(BoxDetection(
-                        box.name.decode("ascii"),
+                name = box.name.decode("ascii")
+                if self.category_types[name] == CategoryType.Box:
+                    detections.box_detections.append(BoxDetection(
+                        name,
                         int(box.bbox.x * w_ratio), int(box.bbox.y * h_ratio),
                         int(box.bbox.w * w_ratio), int(box.bbox.h * h_ratio),
                         self.version, round(box.prob, 2)
                     ))
-                elif self.category_types[box.name] == CategoryType.Point:
-                    detections.box_detections.add(PointDetection(
-                        box.name.decode("ascii"),
-                        int(box.bbox.x * w_ratio), int(box.bbox.y * h_ratio),
-                        int(box.bbox.w * w_ratio), int(box.bbox.h * h_ratio),
+                elif self.category_types[name] == CategoryType.Point:
+                    cx = box.bbox.x * w_ratio
+                    cy = box.bbox.y * h_ratio
+                    detections.point_detections.append(PointDetection(
+                        name,
+                        int(cx), int(cy),
                         self.version, round(box.prob, 2)
                     ))
         except:

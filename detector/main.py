@@ -98,7 +98,7 @@ async def get_detections(np_image, mac: str, tags: str, active_learning=True):
     if active_learning:
         thread = Thread(target=learn, args=(detections, mac, tags, image))
         thread.start()
-    return {'box_detections': jsonable_encoder(detections)}
+    return jsonable_encoder(detections)
 
 
 def learn(detections: Detections, mac: str, tags: Optional[str], cv_image) -> None:

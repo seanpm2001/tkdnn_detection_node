@@ -14,8 +14,8 @@ import shutil
 
 @pytest.fixture(scope='session')
 def detector():
-    assert os.path.exists(
-        '/data/model/model.rt'), "Error: Could not find model. You need to execute 'detection_node % ./download_model_for_testing.sh'"
+    assert os.path.exists('/data/model/model.rt'), \
+        "Error: Could not find model. You need to execute 'detection_node % ./download_model_for_testing.sh'"
     yield Tkdnn(data.ensure_model())
 
 

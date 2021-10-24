@@ -73,7 +73,7 @@ case $cmd in
         docker logs -f --tail 100 $cmd_args $container_name
         ;;
     e | exec)
-        docker exec $cmd_args $container_name
+        docker exec $container_name $cmd_args
         ;;
     a | attach)
         docker exec -it $cmd_args $container_name /bin/bash

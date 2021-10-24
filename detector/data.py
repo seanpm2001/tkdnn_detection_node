@@ -3,12 +3,12 @@ import logging
 import json
 import zipfile
 import io
-from learning_loop_node.detector.about import About
+from learning_loop_node.model_information import ModelInformation
 
 
-def ensure_model():
+def ensure_model() -> ModelInformation:
     with open('/data/model/model.json', 'r') as f:
-        about = About.parse_obj(json.load(f))
+        about = ModelInformation.parse_obj(json.load(f))
         logging.info(f'Using {about}')
 
     # NOTE environment var HOST is expected to not contain the protocol

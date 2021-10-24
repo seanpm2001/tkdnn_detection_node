@@ -5,7 +5,7 @@ import aiofiles
 import os
 from icecream import ic
 from fastapi.datastructures import UploadFile
-from detection import Detection
+from detections import Detections
 from typing import List, Any
 import json
 from datetime import datetime
@@ -30,16 +30,14 @@ class Outbox():
         self.target_uri = f'{base}/api/{o}/projects/{p}/images'
         self.upload_in_progress = False
 
-    def save(self, image, detections: List[Detection] = [], tags: List[str] = []) -> None:
+    def save(self, image, detections: Detections = Detections(), tags: List[str] = []) -> None:
         id = datetime.now().isoformat(sep='_', timespec='milliseconds')
         tmp = f'/data/tmp/{id}'
+        detections.tags = tags
+        detections.date = id
         os.makedirs(tmp, exist_ok=True)
         with open(tmp + '/image.json', 'w') as f:
-            json.dump({
-                'box_detections': jsonable_encoder(detections),
-                'tags': tags,
-                'date': id,
-            }, f)
+            json.dump(jsonable_encoder(detections), f)
         try:
             cv2.imwrite(tmp + '/image.jpg', image)
         except:

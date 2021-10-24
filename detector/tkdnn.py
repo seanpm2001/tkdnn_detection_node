@@ -83,9 +83,7 @@ class Tkdnn():
                 elif self.category_types[name] == CategoryType.Point:
                     cx, cy = (np.average([x, x + w]), np.average([y, y + h]))
                     detections.point_detections.append(PointDetection(
-                        name,
-                        int(cx), int(cy),
-                        self.version, round(box.prob, 2)
+                        name, int(cx), int(cy), self.version, round(box.prob, 2)
                     ))
         except:
             logging.exception('tkdnn inference failed')

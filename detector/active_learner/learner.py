@@ -20,6 +20,9 @@ class Learner:
     def add_box_detections(self, box_detections: List[BoxDetection]) -> List[str]:
         return self.add_detections(Detections(box_detections=box_detections))
 
+    def add_point_detections(self, point_detections: List[PointDetection]) -> List[str]:
+        return self.add_detections(Detections(point_detections=point_detections))
+
     def add_detections(self, detections: Detections) -> List[str]:
         active_learning_causes = set()
 
@@ -45,8 +48,8 @@ class Learner:
         ]
 
     def similar(self, a, b) -> bool:
-        if a is BoxDetection and b is BoxDetection:
+        if type(a) is BoxDetection and type(b) is BoxDetection:
             return a.intersection_over_union(b) >= self.iou_threshold
-        if a is PointDetection and b is PointDetection:
+        if type(a) is PointDetection and type(b) is PointDetection:
             return a.distance(b) < 10
         return False

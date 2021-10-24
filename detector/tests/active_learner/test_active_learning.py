@@ -111,6 +111,6 @@ def test_ignoring_similar_points():
         f'Active Learning should be done due to low confidence'
     assert len(learner.low_conf_observations) == 1, 'detection should be stored'
 
-    active_learning_cause = learner.add_point_detections([PointDetection('point', 104,98, 'xyz', 0.3)])
+    active_learning_cause = learner.add_point_detections([PointDetection('point', 104, 98, 'xyz', 0.3)])
     assert len(learner.low_conf_observations) == 1, f'detection should already be stored'
     assert active_learning_cause == []

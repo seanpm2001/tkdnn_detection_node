@@ -12,6 +12,7 @@ import logging
 from detections import Detections
 from helper import measure
 import os
+import numpy as np
 
 lib = CDLL("/usr/local/lib/libdarknetRT.so", RTLD_GLOBAL)
 
@@ -71,16 +72,16 @@ class Tkdnn():
 
             for box in boxes:
                 name = box.name.decode("ascii")
+                x = int(box.bbox.x * w_ratio)
+                y = int(box.bbox.y * h_ratio)
+                w = int(box.bbox.w * w_ratio)
+                h = int(box.bbox.h * h_ratio)
                 if self.category_types[name] == CategoryType.Box:
                     detections.box_detections.append(BoxDetection(
-                        name,
-                        int(box.bbox.x * w_ratio), int(box.bbox.y * h_ratio),
-                        int(box.bbox.w * w_ratio), int(box.bbox.h * h_ratio),
-                        self.version, round(box.prob, 2)
+                        name, x, y, w, h, self.version, round(box.prob, 2)
                     ))
                 elif self.category_types[name] == CategoryType.Point:
-                    cx = box.bbox.x * w_ratio
-                    cy = box.bbox.y * h_ratio
+                    cx, cy = (np.average([x, x + w]), np.average([y, y + h]))
                     detections.point_detections.append(PointDetection(
                         name,
                         int(cx), int(cy),

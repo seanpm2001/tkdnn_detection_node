@@ -33,13 +33,11 @@ class Outbox():
     def save(self, image, detections: Detections = Detections(), tags: List[str] = []) -> None:
         id = datetime.now().isoformat(sep='_', timespec='milliseconds')
         tmp = f'/data/tmp/{id}'
+        detections.tags = tags
+        detections.date = id
         os.makedirs(tmp, exist_ok=True)
         with open(tmp + '/image.json', 'w') as f:
-            json.dump({
-                'box_detections': jsonable_encoder(detections), #todo adapt
-                'tags': tags,
-                'date': id,
-            }, f)
+            json.dump(jsonable_encoder(detections), f)
         try:
             cv2.imwrite(tmp + '/image.jpg', image)
         except:

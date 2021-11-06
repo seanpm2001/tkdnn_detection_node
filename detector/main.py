@@ -54,7 +54,7 @@ async def info(sid):
 async def upload(sid, data):
     loop = asyncio.get_event_loop()
     try:
-        await loop.run_in_executor(None, lambda: outbox.save(data['image'], [], ['picked_by_system']))
+        await loop.run_in_executor(None, lambda: outbox.save(data['image'], Detections(), ['picked_by_system']))
     except Exception as e:
         logging.exception('could not upload via socketio')
         return {'error': str(e)}

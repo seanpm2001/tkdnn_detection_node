@@ -1,17 +1,16 @@
-from learning_loop_node.model_information import CategoryType, ModelInformation
+from typing import Any, Union
+from learning_loop_node.detector.detector import Detector
+from learning_loop_node.model_information import ModelInformation
+from learning_loop_node.data_classes.category import CategoryType
 import cv2
-from typing import List, Any
-from typing import Union as UNION
 from icecream import ic
-from detections import Detections
-from box_detection import BoxDetection
-from point_detection import PointDetection
+from learning_loop_node.detector.detections import Detections
+from learning_loop_node.detector.box_detection import BoxDetection
+from learning_loop_node.detector.point_detection import PointDetection
 from ctypes import *
 import c_classes as c_classes
 import logging
-from detections import Detections
 from helper import measure
-import os
 import numpy as np
 
 lib = CDLL("/usr/local/lib/libdarknetRT.so", RTLD_GLOBAL)
@@ -36,36 +35,42 @@ get_network_boxes.argtypes = [c_void_p, c_float, POINTER(c_int)]
 get_network_boxes.restype = POINTER(c_classes.DETECTION)
 
 
-class Tkdnn():
+class TkdnnDetector(Detector):
+    image: Any
+    category_types: Any
+    net: Any
+    version: Any
 
-    def __init__(self, model: ModelInformation):
-        model_file = '/data/model/model.rt'
+    def __init__(self, model_format: str) -> None:
+        super().__init__(model_format)
+
+    def init(self,  model_info: ModelInformation, model_root_path: str):
+        model_file = f'{model_root_path}/model.rt'
         try:
-            self.net = load_network(model_file.encode("ascii"), len(model.categories), 1)
+            self.net = load_network(model_file.encode(
+                "ascii"), len(model_info.categories), 1)
         except Exception:
             logging.exception(f'could not load {model_file}')
             raise
 
-        logging.info(f'loaded {model_file}')
-
-        self.image = make_image(model.resolution, model.resolution, 3)
-        self.version = model.version
-        self.category_types = {c.name : c.type for c in  model.categories}
+        self.image = make_image(model_info.resolution,
+                                model_info.resolution, 3)
+        self.version = model_info.version
+        self.category_types = {c.name: c.type for c in model_info.categories}
 
     def evaluate(self, image: Any) -> Detections:
         detections = Detections()
         try:
-            resized = cv2.resize(image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
+            resized = cv2.resize(
+                image, (self.image.w, self.image.h), interpolation=cv2.INTER_LINEAR)
             resized_data = resized.ctypes.data_as(c_char_p)
             copy_image_from_bytes(self.image, resized_data)
-
             num = c_int(0)
             pnum = pointer(num)
             do_inference(self.net, self.image)
-            threshold = 0.2  # TODO make this configurable thorugh REST call
+            threshold = 0.01  # TODO make this configurable thorugh REST call
             boxes = get_network_boxes(self.net, threshold, pnum)
             boxes = [boxes[i] for i in range(pnum[0])]  # convert c to python
-
             (h, w, _) = image.shape
             w_ratio = w/self.image.w
             h_ratio = h/self.image.h
@@ -83,9 +88,11 @@ class Tkdnn():
                 elif self.category_types[name] == CategoryType.Point:
                     cx, cy = (np.average([x, x + w]), np.average([y, y + h]))
                     detections.point_detections.append(PointDetection(
-                        name, int(cx), int(cy), self.version, round(box.prob, 2)
+                        name, int(cx), int(
+                            cy), self.version, round(box.prob, 2)
                     ))
-        except:
+        except Exception as e:
+            ic(f'Exception: {str(e)}')
             logging.exception('tkdnn inference failed')
 
         return detections

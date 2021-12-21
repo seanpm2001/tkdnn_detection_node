@@ -1,31 +1,29 @@
 import uvicorn
-from fastapi import APIRouter, Request, File, UploadFile, Header
+from fastapi import APIRouter, Request, File, UploadFile
 from fastapi.encoders import jsonable_encoder
-from typing import Optional, List, Any
-import cv2
+from typing import Optional, List
 import numpy as np
-from fastapi.responses import JSONResponse
-from icecream import ic
 from fastapi_utils.tasks import repeat_every
 from fastapi_socketio import SocketManager
-import data  # import before DetectorNode
-from tkdnn import Tkdnn
 from outbox import Outbox
-from detections import Detections
+from learning_loop_node.detector.detections import Detections
 from active_learner import learner as l
 from learning_loop_node import DetectorNode
-import helper
 import asyncio
-from datetime import datetime
 from threading import Thread
 import logging
+from tkdnn_detector import TkdnnDetector
 import icecream
 icecream.install()
 
 logging.getLogger().setLevel(logging.INFO)
 
-about = data.ensure_model()
-node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='detector node')
+
+tkdnn_detector = TkdnnDetector(model_format='tensorrt')
+node = DetectorNode(
+    uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='tkdnn detector node', detector=tkdnn_detector)
+
+
 sio = SocketManager(app=node)
 outbox = Outbox()
 router = APIRouter()
@@ -46,9 +44,11 @@ async def upload_image(files: List[UploadFile] = File(...)):
 
     return 200, "OK"
 
+
 @node.sio.event
 async def info(sid):
     return jsonable_encoder(about.dict())
+
 
 @node.sio.event
 async def upload(sid, data):
@@ -72,37 +72,9 @@ async def detect(sid, data):
         return {'error': str(e)}
 
 
-@router.post("/detect")
-async def http_detect(request: Request, file: UploadFile = File(...), mac: str = Header(...), tags: Optional[str] = Header(None)):
-    """
-    Example Usage
-
-        curl --request POST -H 'mac: FF:FF' -F 'file=@test.jpg' localhost:8004/detect
-
-        for i in `seq 1 10`; do time curl --request POST -H 'mac: FF:FF' -F 'file=@test.jpg' localhost:8004/detect; done
-    """
-    try:
-        np_image = np.fromfile(file.file, np.uint8)
-    except:
-        raise Exception(f'Uploaded file {file.filename} is no image file.')
-
-    return JSONResponse(await get_detections(np_image, mac, tags.split(',') if tags else []))
-
-
-async def get_detections(np_image, mac: str, tags: str, active_learning=True):
-    loop = asyncio.get_event_loop()
-    image = await loop.run_in_executor(None, lambda: cv2.imdecode(np_image, cv2.IMREAD_COLOR))
-    detections = await loop.run_in_executor(None, lambda: tkdnn.evaluate(image))
-    info = "\n    ".join([str(d) for d in detections.box_detections])
-    logging.info(f'detected:\n    {info}')
-    if active_learning:
-        thread = Thread(target=learn, args=(detections, mac, tags, image))
-        thread.start()
-    return jsonable_encoder(detections)
-
-
 def learn(detections: Detections, mac: str, tags: Optional[str], cv_image) -> None:
-    active_learning_causes = check_detections_for_active_learning(detections, mac)
+    active_learning_causes = check_detections_for_active_learning(
+        detections, mac)
 
     if any(active_learning_causes):
         tags.append(mac)
@@ -119,12 +91,6 @@ def check_detections_for_active_learning(detections: Detections, mac: str) -> Li
 
     active_learning_causes = learners[mac].add_detections(detections)
     return active_learning_causes
-
-
-@node.on_event("startup")
-def load_model():
-    global tkdnn
-    tkdnn = Tkdnn(about)
 
 
 @node.on_event("startup")
@@ -151,4 +117,5 @@ async def shutdown():
 node.include_router(router, prefix="")
 
 if __name__ == "__main__":
-    uvicorn.run("main:node", host="0.0.0.0", port=80, lifespan='on', reload=True)
+    uvicorn.run("main:node", host="0.0.0.0",
+                port=80, lifespan='on', reload=True)

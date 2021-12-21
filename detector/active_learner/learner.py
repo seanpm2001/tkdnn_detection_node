@@ -1,9 +1,8 @@
 from typing import List, Union
 from active_learner.observation import Observation
-from icecream import ic
-from box_detection import BoxDetection
-from detections import Detections
-from point_detection import PointDetection
+from learning_loop_node.detector.box_detection import BoxDetection
+from learning_loop_node.detector.point_detection import PointDetection
+from learning_loop_node.detector.detections import Detections
 
 
 class Learner:
@@ -14,8 +13,8 @@ class Learner:
 
     def forget_old_detections(self):
         self.low_conf_observations = [detection
-                                    for detection in self.low_conf_observations
-                                    if not detection.is_older_than(self.reset_time)]
+                                      for detection in self.low_conf_observations
+                                      if not detection.is_older_than(self.reset_time)]
 
     def add_box_detections(self, box_detections: List[BoxDetection]) -> List[str]:
         return self.add_detections(Detections(box_detections=box_detections))
@@ -39,7 +38,7 @@ class Learner:
 
         return list(active_learning_causes)
 
-    def find_similar_observations(self, new_detection: Union[BoxDetection]):
+    def find_similar_observations(self, new_detection: BoxDetection):
         return [
             observation
             for observation in self.low_conf_observations

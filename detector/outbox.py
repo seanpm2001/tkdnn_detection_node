@@ -5,7 +5,7 @@ import aiofiles
 import os
 from icecream import ic
 from fastapi.datastructures import UploadFile
-from detections import Detections
+from learning_loop_node.detector.detections import Detections
 from typing import List, Any
 import json
 from datetime import datetime

@@ -1,8 +1,7 @@
 from typing import Union
-from box_detection import BoxDetection
+from learning_loop_node.detector.box_detection import BoxDetection
+from learning_loop_node.detector.point_detection import PointDetection
 from datetime import datetime, timedelta
-
-from point_detection import PointDetection
 
 
 class Observation():

@@ -1,12 +1,11 @@
-import pytest
 from active_learner.observation import Observation
-from box_detection import BoxDetection
+from learning_loop_node.detector.box_detection import BoxDetection
 import time
 
 
-
 def test_aging():
-    _detection = Observation(BoxDetection(None, None, None, None, None, None, None))
+    _detection = Observation(BoxDetection(
+        None, None, None, None, None, None, None))
     time.sleep(0.2)
     assert _detection.is_older_than(0.1) == True
     assert _detection.is_older_than(0.3) == False

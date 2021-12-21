@@ -5,8 +5,8 @@ from active_learner.observation import Observation
 from active_learner import learner as l
 from icecream import ic
 import time
-from box_detection import BoxDetection
-from point_detection import PointDetection
+from learning_loop_node.detector.box_detection import BoxDetection
+from learning_loop_node.detector.point_detection import PointDetection
 
 dirt_detection = BoxDetection('dirt', 0, 0, 100, 100, 'xyz', .3)
 second_dirt_detection = BoxDetection('dirt', 0, 20, 10, 10, 'xyz', .35)
@@ -24,15 +24,20 @@ def test_learner_confidence():
     assert len(learner.low_conf_observations) == 1, 'Detection should be stored'
 
     active_learning_cause = learner.add_box_detections([dirt_detection])
-    assert len(learner.low_conf_observations) == 1, f'Detection should already be stored'
+    assert len(
+        learner.low_conf_observations) == 1, f'Detection should already be stored'
     assert active_learning_cause == []
 
-    active_learning_cause = learner.add_box_detections([conf_too_low_detection])
-    assert len(learner.low_conf_observations) == 1, f'Confidence of detection too low'
+    active_learning_cause = learner.add_box_detections(
+        [conf_too_low_detection])
+    assert len(
+        learner.low_conf_observations) == 1, f'Confidence of detection too low'
     assert active_learning_cause == []
 
-    active_learning_cause = learner.add_box_detections([conf_too_high_detection])
-    assert len(learner.low_conf_observations) == 1, f'Confidence of detection too high'
+    active_learning_cause = learner.add_box_detections(
+        [conf_too_high_detection])
+    assert len(
+        learner.low_conf_observations) == 1, f'Confidence of detection too high'
     assert active_learning_cause == []
 
 
@@ -42,14 +47,14 @@ def test_add_second_detection_to_learner():
     learner.add_box_detections([dirt_detection])
     assert len(learner.low_conf_observations) == 1, 'Detection should be stored'
     learner.add_box_detections([second_dirt_detection])
-    assert len(learner.low_conf_observations) == 2, 'Second detection should be stored'
+    assert len(
+        learner.low_conf_observations) == 2, 'Second detection should be stored'
 
 
 def test_update_last_seen():
     observation = Observation(dirt_detection)
     observation.last_seen = datetime.now() - timedelta(seconds=.5)
     assert observation.is_older_than(0.5) == True
-
 
 
 def test_forget_old_detections():
@@ -62,11 +67,13 @@ def test_forget_old_detections():
 
     assert len(learner.low_conf_observations) == 1
 
-    learner.low_conf_observations[0].last_seen = datetime.now() - timedelta(minutes=30)
+    learner.low_conf_observations[0].last_seen = datetime.now(
+    ) - timedelta(minutes=30)
     learner.forget_old_detections()
     assert len(learner.low_conf_observations) == 1
 
-    learner.low_conf_observations[0].last_seen = datetime.now() - timedelta(hours=1, minutes=1)
+    learner.low_conf_observations[0].last_seen = datetime.now(
+    ) - timedelta(hours=1, minutes=1)
     learner.forget_old_detections()
     assert len(learner.low_conf_observations) == 0
 
@@ -106,11 +113,14 @@ def test_active_learner_extracts_from_json():
 
 def test_ignoring_similar_points():
     learner = l.Learner()
-    active_learning_cause = learner.add_point_detections([PointDetection('point', 100,100,'xyz', 0.3)])
+    active_learning_cause = learner.add_point_detections(
+        [PointDetection('point', 100, 100, 'xyz', 0.3)])
     assert active_learning_cause == ['lowConfidence'], \
         f'Active Learning should be done due to low confidence'
     assert len(learner.low_conf_observations) == 1, 'detection should be stored'
 
-    active_learning_cause = learner.add_point_detections([PointDetection('point', 104, 98, 'xyz', 0.3)])
-    assert len(learner.low_conf_observations) == 1, f'detection should already be stored'
+    active_learning_cause = learner.add_point_detections(
+        [PointDetection('point', 104, 98, 'xyz', 0.3)])
+    assert len(
+        learner.low_conf_observations) == 1, f'detection should already be stored'
     assert active_learning_cause == []

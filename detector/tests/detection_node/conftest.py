@@ -1,22 +1,12 @@
-from logging import Logger
-from typing import Generator
 
+from typing import Generator
 import socketio
-from tkdnn import Tkdnn
 from outbox import Outbox
-import data
 import pytest
 import os
 import asyncio
 import logging
 import shutil
-
-
-@pytest.fixture(scope='session')
-def detector():
-    assert os.path.exists('/data/model/model.rt'), \
-        "Error: Could not find model. You need to execute 'detection_node % ./download_model_for_testing.sh'"
-    yield Tkdnn(data.ensure_model())
 
 
 @pytest.fixture()

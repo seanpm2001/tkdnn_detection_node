@@ -17,6 +17,7 @@ WORKDIR /app/
 COPY ./start.sh /start.sh
 ADD ./detector /app
 ENV PYTHONPATH=/app
+ENV PYTHONPATH "${PYTHONPATH}:/app:/usr/local/lib/python3.6/dist-packages/learning_loop_node"
 
 EXPOSE 80
 

@@ -47,8 +47,6 @@ run_args+="-p 8004:80 "
 
 case $cmd in
     b | build)
-        docker kill $container_name
-        docker rm $container_name # remove existing container
         docker build . --target release -t $image_name $cmd_args
         docker build . -t ${image_name}-dev $cmd_args
         ;;

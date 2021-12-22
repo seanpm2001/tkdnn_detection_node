@@ -1,23 +1,28 @@
 import json
-from glob import glob
-
 import socketio
 import asyncio
-import helper as helper
-from active_learner.learner import Learner
 from outbox import Outbox
-from pydantic.types import Json
 import requests
 import json
 import pytest
 import time
-
+from icecream import ic
 
 base_path = '/data'
 image_name = 'test.jpg'
 json_name = 'test.json'
 image_path = f'{base_path}/{image_name}'
 json_path = f'/tmp/{json_name}'
+
+
+def test_detect_via_rest(sio: socketio.Client):
+    data = {('file', open('tests/test.jpg', 'rb'))}
+    headers = {'mac': '0:0:0:0', 'tags':  'some_tag'}
+    request = requests.post('http://localhost/detect', files=data, headers=headers)
+    assert request.status_code == 200
+    detections = request.json()['box_detections']
+    assert len(detections) == 4
+
 
 @pytest.mark.skip(reason='we need to figure out how to ensure the expected test model is loaded')
 @pytest.mark.asyncio()

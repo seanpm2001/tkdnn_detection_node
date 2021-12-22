@@ -23,7 +23,7 @@ then
 fi
 
 # sourcing .env file to get configuration (see README.md)
-. .env || echo "you should provide an .env file with USERNAME and PASSWORD for the Learning Loop"
+. .env || echo "you should provide an .env file with ORGANIZATION and PROJECT for the Learning Loop"
 
 cmd=$1
 cmd_args=${@:2}

@@ -20,8 +20,7 @@ logging.getLogger().setLevel(logging.INFO)
 
 
 tkdnn_detector = TkdnnDetector(model_format='tensorrt')
-node = DetectorNode(
-    uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='tkdnn detector node', detector=tkdnn_detector)
+node = DetectorNode(uuid='12d7750b-4f0c-4d8d-86c6-c5ad04e19d57', name='tkdnn detector node', detector=tkdnn_detector)
 
 
 sio = SocketManager(app=node)

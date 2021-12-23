@@ -1,25 +1,23 @@
 import os
 from glob import glob
 from fastapi.encoders import jsonable_encoder
-import aiofiles
 import os
 from icecream import ic
-from fastapi.datastructures import UploadFile
 from learning_loop_node.detector.detections import Detections
-from typing import List, Any
+from typing import List
 import json
 from datetime import datetime
 import requests
 import logging
 import cv2
 import shutil
-import threading
+from learning_loop_node.globals import GLOBALS
 
 
 class Outbox():
 
     def __init__(self) -> None:
-        self.path = '/data/outbox'
+        self.path = f'{GLOBALS.data_folder}/outbox'
         if not os.path.exists(self.path):
             os.makedirs(self.path)
 
@@ -32,7 +30,7 @@ class Outbox():
 
     def save(self, image, detections: Detections = Detections(), tags: List[str] = []) -> None:
         id = datetime.now().isoformat(sep='_', timespec='milliseconds')
-        tmp = f'/data/tmp/{id}'
+        tmp = f'/tmp/{id}'
         detections.tags = tags
         detections.date = id
         os.makedirs(tmp, exist_ok=True)
@@ -64,7 +62,7 @@ class Outbox():
                     logging.info(f'uploaded {item} successfully')
                 elif response.status_code == 422:
                     logging.error(f'Broken content in {item}: dropping this data')
-                    shutil.rmtree(item)                    
+                    shutil.rmtree(item)
                 else:
                     logging.error(f'Could not upload {item}: {response.status_code}, {response.content}')
         except:
